@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useCanvasStore } from '../state/canvasStore';
 import { CATEGORY_COLOR } from '../types/graph';
 import { costBreakdown, formatUsd } from '../sim/cost';
-import { computeTrace } from '../sim/engine';
+import { computeTrace, autoscales, baseUnits } from '../sim/engine';
 import { Icon } from './icons';
 
 // Phase 11 — design "Insights" drawer: what the architecture COSTS (always
@@ -36,7 +36,15 @@ export function InsightsPanel() {
     const latency = frame ? computeTrace(nodes, links, frame).total : 0;
     const maxErr = metrics.reduce((m, x) => Math.max(m, x.errorRate), 0);
     const meets = latency <= LATENCY_BUDGET_MS && maxErr <= ERROR_BUDGET && peakSaturation < 0.9;
-    return { latency, maxErr, meets };
+
+    // Autoscaling nodes currently scaled above their base instance count.
+    const metricById = new Map(metrics.map((m) => [m.id, m]));
+    const scaled = nodes
+      .filter((n) => autoscales(n))
+      .map((n) => ({ node: n, base: baseUnits(n), instances: metricById.get(n.id)?.instances ?? baseUnits(n) }))
+      .filter((s) => s.instances > s.base);
+
+    return { latency, maxErr, meets, scaled };
   }, [simRunning, frames, currentFrame, nodes, links, metrics, peakSaturation]);
 
   if (!showInsights) return null;
@@ -116,6 +124,18 @@ export function InsightsPanel() {
                   <span className="insights-metric-budget">headroom &lt; 90%</span>
                 </div>
               </div>
+
+              {perf.scaled.length > 0 && (
+                <div className="insights-autoscale">
+                  <span className="insights-autoscale-title">⇧ Autoscaling active</span>
+                  {perf.scaled.map((s) => (
+                    <div className="insights-autoscale-row" key={s.node.id}>
+                      <span>{s.node.label}</span>
+                      <span className="insights-autoscale-count">{s.base} → {s.instances}×</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </>
           ) : (
             <p className="insights-empty">Run the simulation to measure latency, errors and headroom against the SLO budget.</p>

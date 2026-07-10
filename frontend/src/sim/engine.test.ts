@@ -131,6 +131,42 @@ describe('cache offload', () => {
   });
 });
 
+describe('autoscaling', () => {
+  const autoServer = (id: string, cores: number, maxInstances: number): CanvasNode => ({
+    id, type: 'SERVER', label: id, position: { x: 0, y: 0 },
+    properties: { cpu_cores: cores, memory_gb: 16, auto_scaling: true, max_instances: maxInstances },
+  });
+  const metricOf = (frame: ReturnType<typeof runSimulationSeries>[number], id: string) =>
+    frame.metrics.find((m) => m.id === id)!;
+
+  it('scales up gradually under sustained overload and reports instance count', () => {
+    const nodes = [client('c', 1000), autoServer('s', 1, 6)]; // cap 250/instance, load ≫ cap
+    const links = [link('l1', 'c', 's')];
+    const frames = runSimulationSeries(nodes, links, 'STEADY', [], { frames: 15 });
+
+    // Frame 0 has no prior load observed, so it is still at base (1 instance).
+    expect(metricOf(frames[0], 's').instances).toBe(1);
+    // It ramps up (never more than +1/frame) and saturates at the configured max.
+    expect(metricOf(frames[2], 's').instances).toBe(3);
+    expect(metricOf(frames[frames.length - 1], 's').instances).toBe(6);
+  });
+
+  it('relieves saturation compared with a fixed-size node', () => {
+    const links = [link('l1', 'c', 's')];
+    const auto = runSimulationSeries([client('c', 1000), autoServer('s', 1, 6)], links, 'STEADY', [], { frames: 15 });
+    const fixed = runSimulationSeries([client('c', 1000), server('s', 1)], links, 'STEADY', [], { frames: 15 });
+    const last = (fr: ReturnType<typeof runSimulationSeries>) => fr[fr.length - 1].metrics.find((m) => m.id === 's')!;
+    expect(last(auto).cpuUsage).toBeLessThan(last(fixed).cpuUsage);
+    expect(last(fixed).cpuUsage).toBeGreaterThan(95); // fixed node stays pinned
+  });
+
+  it('leaves opted-out nodes with no instance count', () => {
+    const nodes = [client('c', 1000), server('s', 1)];
+    const frames = runSimulationSeries(nodes, [link('l1', 'c', 's')], 'STEADY', [], { frames: 5 });
+    expect(frames[4].metrics.find((m) => m.id === 's')!.instances).toBeUndefined();
+  });
+});
+
 describe('computeTrace', () => {
   it('traces from the client through the busiest path with growing offsets', () => {
     const nodes = [client('c', 300), server('s', 4)];

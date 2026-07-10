@@ -141,7 +141,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -390,7 +391,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -645,7 +647,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -899,7 +902,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -1131,7 +1135,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -1346,7 +1351,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -1586,7 +1592,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -1786,7 +1793,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -1986,7 +1994,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -2188,7 +2197,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -2408,7 +2418,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -2654,7 +2665,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -2900,7 +2912,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -3147,7 +3160,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -3394,7 +3408,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -3651,7 +3666,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -3883,7 +3899,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -4131,7 +4148,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -4376,7 +4394,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -4609,7 +4628,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -4880,7 +4900,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -5103,7 +5124,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -5303,7 +5325,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -5511,7 +5534,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -5774,7 +5798,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -6046,7 +6071,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -6263,7 +6289,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -6509,7 +6536,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -6758,7 +6786,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -7005,7 +7034,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -7237,7 +7267,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -7459,7 +7490,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -7710,7 +7742,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -7956,7 +7989,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -8202,7 +8236,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -8459,7 +8494,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -8690,7 +8726,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -8937,7 +8974,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -9170,7 +9208,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -9430,7 +9469,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -9677,7 +9717,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -9930,7 +9971,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -10187,7 +10229,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -10405,7 +10448,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -10653,7 +10697,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -10918,7 +10963,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -11166,7 +11212,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -11414,7 +11461,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -11658,7 +11706,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -11893,7 +11942,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -12153,7 +12203,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -12399,7 +12450,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -12631,7 +12683,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -12846,7 +12899,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -13094,7 +13148,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -13346,7 +13401,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -13579,7 +13635,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -13839,7 +13896,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -14096,7 +14154,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -14314,7 +14373,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -14560,7 +14620,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -14774,7 +14835,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -15008,7 +15070,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -15293,7 +15356,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -15510,7 +15574,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -15758,7 +15823,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -16004,7 +16070,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -16251,7 +16318,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -16487,7 +16555,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -16754,7 +16823,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -16966,7 +17036,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -16981,7 +17052,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -17181,7 +17253,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -17380,7 +17453,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -17395,7 +17469,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -17572,7 +17647,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -17859,7 +17935,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -18070,7 +18147,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -18316,7 +18394,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -18763,7 +18842,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -19009,7 +19089,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -19232,7 +19313,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -19476,7 +19558,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -19749,7 +19832,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -20408,7 +20492,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -20655,7 +20740,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -20887,7 +20973,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -21529,7 +21616,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -21966,7 +22054,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -22457,7 +22546,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -22661,7 +22751,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -22921,7 +23012,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -23135,7 +23227,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -23150,7 +23243,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -23326,7 +23420,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -23587,7 +23682,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -23833,7 +23929,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -24080,7 +24177,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -24313,7 +24411,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -24551,7 +24650,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -24798,7 +24898,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -25273,7 +25374,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -25530,7 +25632,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -25763,7 +25866,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -25975,7 +26079,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -25990,7 +26095,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -26147,7 +26253,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -26162,7 +26269,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -26352,7 +26460,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -26586,7 +26695,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -26871,7 +26981,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -27090,7 +27201,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -27374,7 +27486,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         }
       ],
@@ -27594,7 +27707,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -27839,7 +27953,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -28119,7 +28234,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -28336,7 +28452,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -28584,7 +28701,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -28832,7 +28950,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -29087,7 +29206,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -29321,7 +29441,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -29584,7 +29705,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -29834,7 +29956,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -30081,7 +30204,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -30313,7 +30437,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -30551,7 +30676,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -30804,7 +30930,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -31062,7 +31189,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -31281,7 +31409,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -31568,7 +31697,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -31785,7 +31915,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -32032,7 +32163,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -32504,7 +32636,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -32774,7 +32907,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -32993,7 +33127,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -33265,7 +33400,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -33671,7 +33807,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -33686,7 +33823,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -33901,7 +34039,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -34107,7 +34246,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -34354,7 +34494,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -34602,7 +34743,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -34863,7 +35005,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
@@ -35097,7 +35240,8 @@
             "cpu_cores": 4,
             "memory_gb": 16,
             "os": "Linux",
-            "auto_scaling": false
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {

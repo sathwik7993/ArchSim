@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useCanvasStore } from '../state/canvasStore';
+import { autoscales, baseUnits } from '../sim/engine';
 import { CATEGORY_COLOR, CATEGORY_MAP } from '../types/graph';
 import { Icon } from './icons';
 import { Timeline } from './Timeline';
@@ -439,6 +440,9 @@ export function CanvasView() {
           const killed = killedNodeIds.has(node.id);
           const loaded = !killed && !!metric && metric.cpuUsage > 2;
           const loadStatus = loaded ? cpuClass(metric!.cpuUsage) : '';
+          // Autoscaling: show live instance count once it has scaled above base.
+          const scaledOut = !killed && !!metric && autoscales(node)
+            && metric.instances !== undefined && metric.instances > baseUnits(node);
 
           return (
             <div
@@ -458,6 +462,9 @@ export function CanvasView() {
                 </span>
               )}
               {killed && <span className="node-load-chip sim-crit">DOWN</span>}
+              {scaledOut && (
+                <span className="node-scale-chip" title="Autoscaled instances">⇧ {metric!.instances}×</span>
+              )}
 
               <div className="node-body">
                 {/* Port In (Left) */}

@@ -161,10 +161,10 @@ export const COMPONENT_ICON: Record<ComponentType, string> = {
 
 export const DEFAULT_PROPERTIES: Record<ComponentType, Record<string, string | number | boolean>> = {
   CLIENT: { qps: 100, protocol: 'HTTPS', timeout_ms: 5000 },
-  SERVER: { cpu_cores: 4, memory_gb: 16, os: 'Linux', auto_scaling: false },
-  CONTAINER: { image: 'nginx:latest', cpu_limit: 2, memory_limit: 512, replicas: 1 },
+  SERVER: { cpu_cores: 4, memory_gb: 16, os: 'Linux', auto_scaling: false, max_instances: 6 },
+  CONTAINER: { image: 'nginx:latest', cpu_limit: 2, memory_limit: 512, replicas: 1, auto_scaling: false, max_instances: 6 },
   LAMBDA: { runtime: 'nodejs18.x', memory_mb: 256, timeout_seconds: 30, concurrency_limit: 100 },
-  VM: { instance_type: 't3.medium', cpu_cores: 2, memory_gb: 4 },
+  VM: { instance_type: 't3.medium', cpu_cores: 2, memory_gb: 4, auto_scaling: false, max_instances: 4 },
   API_GATEWAY: { rate_limit_rps: 1000, auth_type: 'JWT', cors_enabled: true },
   LOAD_BALANCER: { algorithm: 'round_robin', health_check_interval: 30, max_connections: 10000 },
   CDN: { cache_ttl_seconds: 3600, edge_locations: 50 },
@@ -191,7 +191,7 @@ export const DEFAULT_PROPERTIES: Record<ComponentType, Record<string, string | n
   IAM: { mfa_enabled: true },
   SECRETS_MANAGER: { rotation_enabled: true, rotation_days: 30 },
   K8S_CLUSTER: { version: '1.28', node_count: 3, cni_plugin: 'calico' },
-  K8S_DEPLOYMENT: { replicas: 3, strategy: 'RollingUpdate', cpu_request: 0.5, memory_request: 256 },
+  K8S_DEPLOYMENT: { replicas: 3, strategy: 'RollingUpdate', cpu_request: 0.5, memory_request: 256, auto_scaling: false, max_replicas: 10 },
   K8S_SERVICE: { type: 'ClusterIP', port: 80, target_port: 8080 },
   K8S_INGRESS: { tls_enabled: true, path_type: 'Prefix' },
 };
@@ -251,4 +251,6 @@ export interface ComponentMetric {
   qps: number;
   queueDepth: number;
   errorRate: number;
+  /** Live instance/replica count for an autoscaling node at this frame. */
+  instances?: number;
 }

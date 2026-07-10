@@ -555,6 +555,23 @@ button.primary:hover { filter: brightness(1.08); background: linear-gradient(135
 .node-load-chip.sim-warn { color: var(--warn); border-color: var(--warn); }
 .node-load-chip.sim-crit { color: var(--crit); border-color: var(--crit); }
 
+/* Autoscaling instance chip — top-left so it never collides with the load chip. */
+.node-scale-chip {
+  position: absolute;
+  top: -10px; left: 8px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 7px;
+  border: 1px solid var(--accent-border);
+  background: var(--surface);
+  color: var(--accent);
+  z-index: 12;
+  animation: scale-chip-pop 0.25s ease-out;
+}
+@keyframes scale-chip-pop { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
 /* Canvas controls */
 .canvas-controls {
   position: absolute;
@@ -2094,5 +2111,10 @@ kbd {
 .insights-metric-val em { font-size: 12px; font-style: normal; color: var(--text-dim); margin-left: 1px; }
 .insights-metric-name { align-self: end; font-size: 12px; font-weight: 600; color: var(--text); }
 .insights-metric-budget { font-size: 10.5px; color: var(--text-mute); }
+
+.insights-autoscale { margin-top: 12px; padding: 10px 12px; border-radius: 8px; background: var(--accent-soft); border: 1px solid var(--accent-border); }
+.insights-autoscale-title { display: block; font-size: 11px; font-weight: 700; color: var(--accent); margin-bottom: 6px; }
+.insights-autoscale-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text); padding: 2px 0; }
+.insights-autoscale-count { font-family: var(--font-mono); font-weight: 600; color: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) { .insights-panel { animation: none; } }

@@ -122,6 +122,35 @@ function nodeCapacity(node: CanvasNode): number {
   }
 }
 
+/* ──────────────────────── Autoscaling (Phase 11) ──────────────────────── */
+
+/** A node autoscales only when explicitly opted in via `auto_scaling: true`. */
+export function autoscales(node: CanvasNode): boolean {
+  return node.properties.auto_scaling === true;
+}
+
+/**
+ * Instance/replica count already baked into a node's configured capacity — the
+ * "1×" baseline that autoscaling multiplies up from.
+ */
+export function baseUnits(node: CanvasNode): number {
+  switch (node.type) {
+    case 'CONTAINER':
+      return Math.max(1, num(node.properties.replicas, 1));
+    case 'K8S_DEPLOYMENT':
+      return Math.max(1, num(node.properties.replicas, 3));
+    default:
+      return 1;
+  }
+}
+
+/** Upper bound on instances an autoscaler may add (config-driven, ≥ base). */
+export function maxUnits(node: CanvasNode): number {
+  const base = baseUnits(node);
+  const configured = num(node.properties.max_instances, num(node.properties.max_replicas, base * 4));
+  return Math.max(base, configured);
+}
+
 /** Baseline idle memory footprint (MB) per component type. */
 function baseMemoryMb(node: CanvasNode): number {
   const p = node.properties;
@@ -371,6 +400,12 @@ export function runSimulationSeries(
   }
   const clients = nodes.filter((n) => n.type === 'CLIENT');
 
+  // Autoscaling state carried across frames: current instance count per node and
+  // the load it saw last frame (autoscalers react to observed load, with lag).
+  const autoNodes = nodes.filter(autoscales);
+  const unitState = new Map<string, number>(autoNodes.map((n) => [n.id, baseUnits(n)]));
+  const prevLoad = new Map<string, number>();
+
   const frames: Frame[] = [];
   for (let i = 0; i < N; i++) {
     const p = N > 1 ? i / (N - 1) : 0;
@@ -406,7 +441,26 @@ export function runSimulationSeries(
           break;
       }
     }
-    const capOf = (node: CanvasNode) => (killed.has(node.id) ? 0 : nodeCapacity(node) * (capMul.get(node.id) ?? 1));
+    // Autoscaling: pick a target instance count from last frame's load (target
+    // ~70% utilisation), then ramp toward it — scale up fast (+1 instance/frame),
+    // scale down slowly (−0.34/frame) to avoid flapping. scaleMul multiplies the
+    // node's configured capacity.
+    const scaleMul = new Map<string, number>();
+    for (const node of autoNodes) {
+      const bu = baseUnits(node);
+      const mu = maxUnits(node);
+      const perUnitCap = nodeCapacity(node) / bu;
+      const prev = prevLoad.get(node.id) ?? 0;
+      const targetUnits = Math.min(mu, Math.max(bu, Math.ceil(prev / (perUnitCap * 0.7))));
+      let cur = unitState.get(node.id) ?? bu;
+      if (targetUnits > cur) cur = Math.min(targetUnits, cur + 1);
+      else if (targetUnits < cur) cur = Math.max(targetUnits, cur - 0.34);
+      unitState.set(node.id, cur);
+      scaleMul.set(node.id, cur / bu);
+    }
+
+    const capOf = (node: CanvasNode) =>
+      killed.has(node.id) ? 0 : nodeCapacity(node) * (capMul.get(node.id) ?? 1) * (scaleMul.get(node.id) ?? 1);
 
     const generated = new Map<string, number>();
     for (const c of clients) generated.set(c.id, num(c.properties.qps, 100) * m * traffic);
@@ -439,7 +493,7 @@ export function runSimulationSeries(
     let total = 0;
     for (const node of nodes) {
       const load = inflow.get(node.id) ?? 0;
-      const cap = nodeCapacity(node) * (capMul.get(node.id) ?? 1);
+      const cap = nodeCapacity(node) * (capMul.get(node.id) ?? 1) * (scaleMul.get(node.id) ?? 1);
       const source = cap === Infinity;
       const isKilled = killed.has(node.id);
 
@@ -459,7 +513,10 @@ export function runSimulationSeries(
       satById.set(node.id, clamped);
       peak = Math.max(peak, clamped);
       if (node.type === 'CLIENT') total += load;
-      metrics.push({ id: node.id, cpuUsage: cpu, ramUsageMb: ram, qps, queueDepth: queue, errorRate: err });
+      const instances = scaleMul.has(node.id) ? Math.round((unitState.get(node.id) ?? baseUnits(node))) : undefined;
+      metrics.push({ id: node.id, cpuUsage: cpu, ramUsageMb: ram, qps, queueDepth: queue, errorRate: err, instances });
+      // Feed this frame's observed load into next frame's scaling decision.
+      if (scaleMul.has(node.id)) prevLoad.set(node.id, load);
     }
 
     const linkFlows: Record<string, LinkFlow> = {};
