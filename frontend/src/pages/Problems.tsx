@@ -7,6 +7,7 @@ import { useProgress } from '../state/progress';
 import { useCanvasStore } from '../state/canvasStore';
 import { useWorkspace } from '../state/workspace';
 import { fetchProblemSummaries, type ProblemSummaryDto } from '../api/problems';
+import { AccountMenu } from '../components/AccountMenu';
 
 type SortKey = 'difficulty' | 'az';
 const DIFFS: Array<Difficulty | 'All'> = ['All', 'Easy', 'Medium', 'Hard'];
@@ -83,9 +84,12 @@ export function Problems() {
           <strong>ArchSim</strong>
           <span className="brand-subtitle">Practice</span>
         </div>
-        <button className="ghost-btn icon-only" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle theme">
-          {theme === 'dark' ? '☀' : '☾'}
-        </button>
+        <div className="dash-topbar-actions">
+          <button className="ghost-btn icon-only" onClick={toggleTheme} aria-label="Toggle theme" title="Toggle theme">
+            {theme === 'dark' ? '☀' : '☾'}
+          </button>
+          <AccountMenu />
+        </div>
       </header>
 
       <div className="problems-body">

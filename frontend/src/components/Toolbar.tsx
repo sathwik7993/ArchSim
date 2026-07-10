@@ -26,6 +26,8 @@ export function Toolbar({ onSave, onSimulate, onAnalyze, saveLoading, simRunning
   const theme = useCanvasStore((state) => state.theme);
   const toggleTheme = useCanvasStore((state) => state.toggleTheme);
   const stopSimulation = useCanvasStore((state) => state.stopSimulation);
+  const showInsights = useCanvasStore((state) => state.showInsights);
+  const toggleInsights = useCanvasStore((state) => state.toggleInsights);
 
   return (
     <div className="toolbar">
@@ -66,6 +68,14 @@ export function Toolbar({ onSave, onSimulate, onAnalyze, saveLoading, simRunning
         <button onClick={onAnalyze} disabled={analyzeLoading} title="Analyze architecture for risks">
           <S d="M11 3a8 8 0 100 16 8 8 0 000-16zM21 21l-4.3-4.3" />
           {analyzeLoading ? 'Analyzing…' : 'Analyze'}
+        </button>
+        <button
+          onClick={toggleInsights}
+          style={showInsights ? { borderColor: 'var(--accent-border)', background: 'var(--accent-soft)', color: 'var(--accent)' } : undefined}
+          title="Estimated cost & SLO performance budget"
+        >
+          <S d="M3 3v18h18M7 15l4-4 3 3 5-6" />
+          Insights
         </button>
         <button
           className={simRunning ? '' : 'primary'}

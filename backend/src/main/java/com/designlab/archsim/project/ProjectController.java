@@ -37,6 +37,71 @@ public class ProjectController {
     return projects.findByOwnerIdOrderByUpdatedAtDesc(principal.getName()).stream().map(ProjectResponse::from).toList();
   }
 
+  /**
+   * Full pull for the local-first workspace: every project the user owns, WITH
+   * its canvas, so the frontend can merge server state into localStorage in one
+   * round trip (last-write-wins on updatedAt).
+   */
+  @GetMapping("/sync")
+  public List<FullProject> sync(Principal principal) {
+    return projects.findByOwnerIdOrderByUpdatedAtDesc(principal.getName()).stream()
+        .map(project -> {
+          CanvasState state = canvasStates.findById(project.id).orElse(null);
+          JsonNode nodes = state != null ? state.nodes : objectMapper.createArrayNode();
+          JsonNode links = state != null ? state.links : objectMapper.createArrayNode();
+          return new FullProject(
+              project.id, project.name, project.description, project.problemSlug,
+              project.updatedAt.toEpochMilli(), nodes, links);
+        })
+        .toList();
+  }
+
+  /**
+   * Upsert a project by the client's own id (idempotent). The frontend owns the
+   * id namespace (e.g. `proj-xxxx`, `practice-<slug>`), so we create-or-update in
+   * place rather than minting a server id — keeps local and cloud in lockstep.
+   */
+  @PutMapping("/{projectId}")
+  @Transactional
+  public FullProject upsert(
+      @PathVariable String projectId,
+      @RequestBody UpsertProjectRequest request,
+      Principal principal
+  ) {
+    Project project = projects.findById(projectId).orElse(null);
+    if (project == null) {
+      project = new Project();
+      project.id = projectId;
+      project.ownerId = principal.getName();
+      project.tenantId = principal.getName();
+      project.createdAt = Instant.now();
+    } else if (!project.ownerId.equals(principal.getName())) {
+      throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Project belongs to another user");
+    }
+    project.name = request.name() == null ? "Untitled design" : request.name();
+    project.description = request.description();
+    project.problemSlug = request.problemSlug();
+    project.updatedAt = request.updatedAt() != null ? Instant.ofEpochMilli(request.updatedAt()) : Instant.now();
+    project.version += 1;
+    projects.save(project);
+
+    CanvasState state = canvasStates.findById(projectId).orElseGet(() -> {
+      CanvasState created = new CanvasState();
+      created.projectId = projectId;
+      created.metadata = objectMapper.createObjectNode();
+      return created;
+    });
+    state.nodes = request.nodes() == null ? objectMapper.createArrayNode() : request.nodes();
+    state.links = request.links() == null ? objectMapper.createArrayNode() : request.links();
+    if (state.metadata == null) state.metadata = objectMapper.createObjectNode();
+    state.updatedAt = project.updatedAt;
+    canvasStates.save(state);
+
+    return new FullProject(
+        project.id, project.name, project.description, project.problemSlug,
+        project.updatedAt.toEpochMilli(), state.nodes, state.links);
+  }
+
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   @Transactional
@@ -111,6 +176,11 @@ public class ProjectController {
   }
 
   public record CreateProjectRequest(String name, String description) {}
+  public record UpsertProjectRequest(
+      String name, String description, String problemSlug, Long updatedAt, JsonNode nodes, JsonNode links) {}
+  public record FullProject(
+      String projectId, String name, String description, String problemSlug,
+      long updatedAt, JsonNode nodes, JsonNode links) {}
   public record CanvasPayload(JsonNode nodes, JsonNode links, JsonNode metadata) {}
   public record SaveCanvasResponse(String projectId, String status, Instant updatedAt) {}
   public record ProjectResponse(String projectId, String name, String description, Instant createdAt, int version) {

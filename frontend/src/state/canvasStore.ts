@@ -78,6 +78,7 @@ interface CanvasState {
   playing: boolean;
   incidents: Incident[];
   showTrace: boolean;
+  showInsights: boolean;
   trafficLevel: number;
 
   // Theme
@@ -123,6 +124,7 @@ interface CanvasState {
   removeIncident: (id: string) => void;
   clearIncidents: () => void;
   toggleTrace: () => void;
+  toggleInsights: () => void;
   setTrafficLevel: (level: number) => void;
 
   // Theme
@@ -149,6 +151,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   playing: false,
   incidents: [],
   showTrace: false,
+  showInsights: false,
   trafficLevel: 1,
   theme: readInitialTheme(),
 
@@ -391,6 +394,8 @@ export const useCanvasStore = create<CanvasState>((set, get) => ({
   },
 
   toggleTrace: () => set({ showTrace: !get().showTrace }),
+
+  toggleInsights: () => set({ showInsights: !get().showInsights }),
 
   setTrafficLevel: (level) => {
     set({ trafficLevel: level });

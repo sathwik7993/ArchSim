@@ -4,6 +4,7 @@ import { CATEGORY_COLOR, CATEGORY_MAP } from '../types/graph';
 import { Icon } from './icons';
 import { Timeline } from './Timeline';
 import { TraceViewer } from './TraceViewer';
+import { InsightsPanel } from './InsightsPanel';
 
 const NODE_WIDTH = 200;
 const NODE_HEIGHT = 80;
@@ -159,36 +160,52 @@ export function CanvasView() {
     }
   };
 
-  // Zooming via wheel / trackpad. Zoom is proportional to the actual scroll
-  // delta (not a fixed step) so a trackpad's many tiny events no longer
-  // over-zoom. Deltas are normalised across deltaMode, and pinch gestures
-  // (ctrlKey) use a gentler sensitivity than a mouse wheel.
-  const handleWheel = (e: React.WheelEvent) => {
-    e.preventDefault();
-    if (!containerRef.current) return;
+  // Mirror pan/zoom into refs so the native wheel listener (registered once)
+  // always reads the latest transform without re-subscribing every render.
+  const panStateRef = useRef(pan);
+  const zoomStateRef = useRef(zoom);
+  panStateRef.current = pan;
+  zoomStateRef.current = zoom;
 
-    const rect = containerRef.current.getBoundingClientRect();
-    const cursorX = e.clientX - rect.left;
-    const cursorY = e.clientY - rect.top;
+  // Zooming via wheel / trackpad. React's onWheel is passive, so preventDefault
+  // there is ignored and a trackpad pinch (wheel + ctrlKey) zooms the whole
+  // browser instead of the canvas. We register a NATIVE non-passive listener so
+  // preventDefault actually sticks and only the canvas zooms. Zoom is
+  // proportional to the scroll delta (normalised across deltaMode); pinch
+  // gestures (ctrlKey) use a gentler sensitivity than a mouse wheel.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
 
-    // Normalise delta to pixels, then clamp so one big fling can't jump zoom.
-    let delta = e.deltaY;
-    if (e.deltaMode === 1) delta *= 16;          // lines → px
-    else if (e.deltaMode === 2) delta *= rect.height; // pages → px
-    delta = Math.max(-40, Math.min(40, delta));
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const cursorX = e.clientX - rect.left;
+      const cursorY = e.clientY - rect.top;
 
-    const intensity = e.ctrlKey ? 0.008 : 0.0025; // pinch vs wheel/scroll
-    const factor = Math.exp(-delta * intensity);
-    const nextZoom = Math.max(0.25, Math.min(zoom * factor, 3.0));
-    if (nextZoom === zoom) return;
+      let delta = e.deltaY;
+      if (e.deltaMode === 1) delta *= 16;          // lines → px
+      else if (e.deltaMode === 2) delta *= rect.height; // pages → px
+      delta = Math.max(-40, Math.min(40, delta));
 
-    // Keep the point under the cursor fixed while zooming.
-    const x = cursorX - (cursorX - pan.x) * (nextZoom / zoom);
-    const y = cursorY - (cursorY - pan.y) * (nextZoom / zoom);
+      const zoom = zoomStateRef.current;
+      const pan = panStateRef.current;
+      const intensity = e.ctrlKey ? 0.008 : 0.0025; // pinch vs wheel/scroll
+      const factor = Math.exp(-delta * intensity);
+      const nextZoom = Math.max(0.25, Math.min(zoom * factor, 3.0));
+      if (nextZoom === zoom) return;
 
-    setZoom(nextZoom);
-    setPan({ x, y });
-  };
+      // Keep the point under the cursor fixed while zooming.
+      const x = cursorX - (cursorX - pan.x) * (nextZoom / zoom);
+      const y = cursorY - (cursorY - pan.y) * (nextZoom / zoom);
+
+      setZoom(nextZoom);
+      setPan({ x, y });
+    };
+
+    container.addEventListener('wheel', onWheel, { passive: false });
+    return () => container.removeEventListener('wheel', onWheel);
+  }, []);
 
   // Zoom controls: Zoom In, Zoom Out, Fit View
   const zoomIn = () => {
@@ -320,7 +337,6 @@ export function CanvasView() {
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseDown={handleCanvasMouseDown}
-      onWheel={handleWheel}
     >
       <div
         className="canvas-transform-layer"
@@ -523,6 +539,9 @@ export function CanvasView() {
           </button>
         </div>
       )}
+
+      {/* Cost + SLO insights drawer */}
+      <InsightsPanel />
 
       {/* Distributed trace waterfall */}
       <TraceViewer />

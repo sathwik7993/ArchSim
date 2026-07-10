@@ -23,6 +23,10 @@ public class Project {
   @Column(name = "owner_id", nullable = false)
   public String ownerId;
 
+  /** When set, this project is a practice workspace linked to a problem slug. */
+  @Column(name = "problem_slug")
+  public String problemSlug;
+
   @Column(name = "created_at")
   public Instant createdAt = Instant.now();
 

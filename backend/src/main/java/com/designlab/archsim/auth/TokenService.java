@@ -10,6 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {
+  // Access tokens are long-lived (30 days) so students stay signed in across
+  // sessions. There is no refresh-token infrastructure; this is a deliberate
+  // trade-off for a low-stakes learning app where the token only guards a user's
+  // own designs and progress.
+  private static final long TOKEN_TTL_SECONDS = 30L * 24 * 60 * 60;
+
   private final byte[] secret;
 
   public TokenService(@Value("${archsim.security.token-secret}") String secret) {
@@ -17,7 +23,7 @@ public class TokenService {
   }
 
   public String issue(String userId) {
-    long expiresAt = Instant.now().plusSeconds(900).getEpochSecond();
+    long expiresAt = Instant.now().plusSeconds(TOKEN_TTL_SECONDS).getEpochSecond();
     String payload = userId + "." + expiresAt;
     return Base64.getUrlEncoder().withoutPadding().encodeToString(payload.getBytes(StandardCharsets.UTF_8))
         + "."

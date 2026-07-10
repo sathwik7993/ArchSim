@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { HeroDiagram } from '../components/HeroDiagram';
+import { AccountMenu } from '../components/AccountMenu';
 import { useCanvasStore } from '../state/canvasStore';
 
 // Small concept icons for the feature grid (stroke-based, inherit currentColor).
@@ -42,7 +43,6 @@ const FEATURES: Feature[] = [
     icon: S('M12 3l2.2 5.6L20 9l-4.5 3.9L17 19l-5-3.2L7 19l1.5-6.1L4 9l5.8-.4z'),
     title: 'AI design evaluation',
     body: 'Bring your own free Google Gemini key and get a scored review of your architecture — bottlenecks, single points of failure and missing pieces.',
-    tag: 'Coming soon',
   },
   {
     icon: S('M4 4h7v7H4z|M13 4h7v7h-7z|M4 13h7v7H4z|M13 13h7v7h-7z'),
@@ -84,6 +84,7 @@ export function Landing() {
           <button className="ghost-btn" onClick={toggleTheme} aria-label="Toggle colour theme" title="Toggle theme">
             {theme === 'dark' ? '☀' : '☾'}
           </button>
+          <AccountMenu />
           <Link className="primary-btn" to="/dashboard">Open workbench</Link>
         </nav>
       </header>

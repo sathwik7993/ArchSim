@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,7 +38,7 @@ public class AuthController {
     user.displayName = request.displayName();
     user.passwordHash = passwordEncoder.encode(request.password());
     users.save(user);
-    return new AuthResponse(user.id, tokenService.issue(user.id));
+    return AuthResponse.of(user, tokenService.issue(user.id));
   }
 
   @PostMapping("/login")
@@ -47,7 +48,7 @@ public class AuthController {
     if (!passwordEncoder.matches(request.password(), user.passwordHash)) {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
-    return new AuthResponse(user.id, tokenService.issue(user.id));
+    return AuthResponse.of(user, tokenService.issue(user.id));
   }
 
   @PostMapping("/refresh")
@@ -58,8 +59,24 @@ public class AuthController {
     return Map.of("accessToken", tokenService.issue(principal.getName()));
   }
 
+  /** Restore the signed-in user from a stored token (used on app reload). */
+  @GetMapping("/me")
+  public UserDto me(Principal principal) {
+    if (principal == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not signed in");
+    }
+    UserAccount user = users.findById(principal.getName())
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unknown user"));
+    return new UserDto(user.id, user.email, user.displayName);
+  }
+
   public record RegisterRequest(String email, String password, String displayName) {}
   public record LoginRequest(String email, String password) {}
-  public record AuthResponse(String userId, String accessToken) {}
+  public record UserDto(String userId, String email, String displayName) {}
+  public record AuthResponse(String userId, String email, String displayName, String accessToken) {
+    static AuthResponse of(UserAccount user, String token) {
+      return new AuthResponse(user.id, user.email, user.displayName, token);
+    }
+  }
 }
 

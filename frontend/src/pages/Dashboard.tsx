@@ -4,6 +4,8 @@ import { useWorkspace, ensureSeededWorkspace, type ProjectMeta, type StoredProje
 import { useCanvasStore } from '../state/canvasStore';
 import { CanvasThumbnail } from '../components/CanvasThumbnail';
 import { TemplateGallery } from '../components/TemplateGallery';
+import { AccountMenu } from '../components/AccountMenu';
+import { useAuth } from '../state/auth';
 import type { Template } from '../data/templates';
 
 function timeAgo(ts: number): string {
@@ -38,6 +40,7 @@ export function Dashboard() {
 
   const theme = useCanvasStore((s) => s.theme);
   const toggleTheme = useCanvasStore((s) => s.toggleTheme);
+  const user = useAuth((s) => s.user);
 
   const [modal, setModal] = useState<ModalState | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
@@ -87,6 +90,7 @@ export function Dashboard() {
           <button className="ghost-btn icon-only" onClick={toggleTheme} title="Toggle theme" aria-label="Toggle theme">
             {theme === 'dark' ? '☀' : '☾'}
           </button>
+          <AccountMenu />
         </div>
       </header>
 
@@ -94,7 +98,9 @@ export function Dashboard() {
         <div className="dash-head">
           <div>
             <h1 className="dash-title">Your designs</h1>
-            <p className="dash-sub">{projects.length} project{projects.length === 1 ? '' : 's'} · saved locally in your browser</p>
+            <p className="dash-sub">
+              {projects.length} project{projects.length === 1 ? '' : 's'} · {user ? 'synced to your account' : 'saved locally in your browser'}
+            </p>
           </div>
           <div className="dash-head-actions">
             <button className="ghost-btn" onClick={() => setShowTemplates(true)}>
