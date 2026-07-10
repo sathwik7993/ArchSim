@@ -1,0 +1,2107 @@
+{
+  "generated_by": "Claude (Cowork) via Apify",
+  "sources": [
+    {
+      "site": "HelloInterview",
+      "listing_url": "https://www.hellointerview.com/learn/system-design/in-a-hurry/problem-breakdowns"
+    },
+    {
+      "site": "ScaleMock",
+      "listing_url": "https://www.scalemock.com/hld"
+    }
+  ],
+  "note": "Full paid/paywalled article text is intentionally NOT reproduced here. Each entry lists the source site(s), the problem title/URL, and an original one-sentence summary of the core design problem, written independently rather than copied from either site.",
+  "total_problems": 148,
+  "problems": [
+    {
+      "name": "Blogging Platform (WordPress-style)",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Blogging Platform (WordPress-style)",
+          "url": "https://www.scalemock.com/hld?page=16",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Create, publish, and manage blog posts; an entry-level content-management/CRUD design problem."
+    },
+    {
+      "name": "Dropbox / Cloud File Storage",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Dropbox",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/dropbox",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Dropbox (File Sync)",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Store, share, and sync files across devices; the interesting problems are uploading/downloading large files efficiently (chunking, resumable transfers), keeping local and remote copies in sync, and controlling access to shared files.",
+      "note": "ScaleMock lists this as Hard; HelloInterview treats it as an entry-level (Easy) product-design question."
+    },
+    {
+      "name": "Image Hosting Service (Imgur)",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Image Hosting Service (Imgur)",
+          "url": "https://www.scalemock.com/hld?page=16",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Upload, host, and share images; a lighter-weight version of Dropbox/Google Photos-style blob storage and CDN delivery."
+    },
+    {
+      "name": "Local Delivery Service (Gopuff)",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Local Delivery Service",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/gopuff",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Show real-time item availability aggregated across nearby micro-warehouses and let users order without double-booking inventory; centers on fast geo-filtered availability lookups and consistent inventory decrement on checkout."
+    },
+    {
+      "name": "Parking Lot System",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Parking Lot System",
+          "url": "https://www.scalemock.com/hld?page=16",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Track vehicles, available spots, and payments; a classic object-modeling exercise (often used for both HLD and LLD) more than a scale problem."
+    },
+    {
+      "name": "Pastebin (Text Storage)",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Pastebin (Text Storage)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Store and share plain-text snippets via a short link; a simpler cousin of the URL-shortener problem focused on text blob storage rather than redirects."
+    },
+    {
+      "name": "Poll/Voting System",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Poll/Voting System",
+          "url": "https://www.scalemock.com/hld?page=16",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Create polls and tally votes in real time; centers on preventing duplicate votes and aggregating results with low latency."
+    },
+    {
+      "name": "QR Code Generator",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "QR Code Generator",
+          "url": "https://www.scalemock.com/hld?page=16",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Generate (optionally trackable) QR codes; a simple encoding/generation service, often paired with URL-shortener-style redirect tracking."
+    },
+    {
+      "name": "To-Do List App",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "To-Do List App",
+          "url": "https://www.scalemock.com/hld?page=16",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A simple task-tracking CRUD app; a good first system-design warm-up focused on basic API/data-model design rather than scale."
+    },
+    {
+      "name": "URL Shortener",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Bitly",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/bitly",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a URL Shortener (TinyURL)",
+          "url": "https://www.scalemock.com/hld?page=1",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Convert long URLs into short, unique codes and redirect visitors back to the original; the core challenges are collision-free code generation at scale and serving redirects with very low latency given a read-heavy workload."
+    },
+    {
+      "name": "Yelp / Local Business Search",
+      "difficulty": "Easy",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Yelp",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/yelp",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Yelp (Local Search)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Let users search nearby businesses by location and category and leave reviews; the core problem is efficient geospatial search combined with keeping aggregate ratings fresh and consistent.",
+      "note": "ScaleMock lists this as Hard; HelloInterview treats it as an entry-level (Easy) product-design question."
+    },
+    {
+      "name": "Airbnb (Hotel Booking)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Airbnb (Hotel Booking)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Search available listings by location/date and book without double-booking; the core problem is availability search combined with concurrency-safe reservation locking."
+    },
+    {
+      "name": "Amazon (E-commerce)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Amazon (E-commerce)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Browse, cart, and purchase products at large catalog/order scale; centers on catalog search, inventory consistency, and order/checkout workflows."
+    },
+    {
+      "name": "Bike/Scooter Sharing System (Lime)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Bike/Scooter Sharing System (Lime)",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Locate, unlock, and bill dockless vehicles; centers on tracking real-time vehicle location/availability and secure IoT unlock commands."
+    },
+    {
+      "name": "Blogging Platform (Medium-the-site)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Blogging Platform (Medium-the-site)",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Publish and read long-form articles; centers on content storage/rendering and a following/recommendation-driven read feed."
+    },
+    {
+      "name": "CAPTCHA System (reCAPTCHA)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "CAPTCHA System (reCAPTCHA)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Distinguish humans from bots on forms; involves generating/verifying challenges and increasingly, passive behavioral risk scoring."
+    },
+    {
+      "name": "Coursera (Learning Platform)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Coursera (Learning Platform)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Host video courses with progress tracking and quizzes; centers on video delivery plus per-user progress/state tracking at scale."
+    },
+    {
+      "name": "Crash Reporting System (Sentry)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Crash Reporting System (Sentry)",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Collect and de-duplicate application crash/error reports; centers on error fingerprinting/grouping and high-volume event ingestion."
+    },
+    {
+      "name": "Cricinfo (Live Sports Scoring)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Cricinfo (Live Sports Scoring)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Real-time ball-by-ball score updates and commentary fan-out to huge concurrent audiences during live matches."
+    },
+    {
+      "name": "Digital Library System",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Digital Library System",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Borrow and read digital books; involves licensing/concurrent-loan limits and content delivery of large e-book/audio files."
+    },
+    {
+      "name": "Digital Signature Service (DocuSign)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Digital Signature Service (DocuSign)",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Securely route documents for e-signature; involves document workflow state machines and cryptographic signature verification."
+    },
+    {
+      "name": "Distributed Cache (Redis-like)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Distributed Cache",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/distributed-cache",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Distributed Cache (Redis)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Build a horizontally-scalable in-memory key-value cache; the core problems are consistent hashing for shard placement, replication for durability, and eviction policy design.",
+      "note": "ScaleMock lists this as Hard; HelloInterview lists it as Medium."
+    },
+    {
+      "name": "Distributed Counter",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed Counter",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A counter that can absorb millions of increments per second (e.g., view counts); centers on sharded counters with periodic aggregation rather than a single hot row."
+    },
+    {
+      "name": "Distributed Job Scheduler",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Job Scheduler",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/job-scheduler",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Distributed Job Scheduler",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Schedule and reliably execute millions of delayed or recurring jobs (cron-like); the core problems are efficient time-based scheduling at scale and exactly/at-least-once execution guarantees.",
+      "note": "ScaleMock lists this as Hard; HelloInterview lists it as Medium."
+    },
+    {
+      "name": "Distributed Logging System",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed Logging System",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "An ELK/Splunk-style log pipeline; involves high-throughput log ingestion, indexing for full-text search, and retention/rollup policies."
+    },
+    {
+      "name": "Distributed Rate Limiter",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Rate Limiter",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/distributed-rate-limiter",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Rate Limiter",
+          "url": "https://www.scalemock.com/hld?page=1",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Cap how many requests a client can make in a time window across many stateless API servers; the key problem is sharing counter state (token bucket/sliding window) consistently and cheaply across nodes."
+    },
+    {
+      "name": "DoorDash (Food Delivery)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "DoorDash (Food Delivery)",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Match orders to nearby couriers and track delivery in real time; similar in spirit to ride-hailing dispatch but paired with restaurant order/prep workflows."
+    },
+    {
+      "name": "Facebook Live Comments",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "FB Live Comments",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-live-comments",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Stream a very high-throughput, ordered comment feed to many concurrent viewers of a live video; centers on fan-out of a rapid write stream to large numbers of simultaneous readers."
+    },
+    {
+      "name": "Facebook News Feed",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "FB News Feed",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-news-feed",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design News Feed System",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Aggregate posts from many sources a user follows into a single ranked, paginated feed; the central tradeoff is precomputing (fan-out on write) versus assembling feeds on demand (fan-out on read).",
+      "note": "ScaleMock lists this as Hard; HelloInterview lists it as Medium."
+    },
+    {
+      "name": "Fantasy Sports System",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Fantasy Sports System",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Users draft virtual teams scored against real athlete stats; centers on ingesting live sports data feeds and recomputing scores/rankings in near real time."
+    },
+    {
+      "name": "Feature Flag Management System",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Feature Flag Management System",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Toggle features per user/segment for gradual rollouts and A/B tests; centers on low-latency flag evaluation and fast global config propagation."
+    },
+    {
+      "name": "Game/Contest Leaderboard",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Game Leaderboard",
+          "url": null,
+          "has_written_content": false
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Leaderboard System",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Maintain and serve real-time rankings for millions of players; the standard approach uses an in-memory sorted-set structure (e.g. Redis ZSET) for fast rank/score queries at scale."
+    },
+    {
+      "name": "Instagram / Photo Sharing",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Instagram",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/instagram",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Instagram (Photo Sharing)",
+          "url": "https://www.scalemock.com/hld?page=1",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Users upload photos, follow others, and view a feed; key challenges are efficient feed generation (fan-out on write vs read) and serving media at scale via blob storage and a CDN."
+    },
+    {
+      "name": "Local Food/Restaurant Review App",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Food Review App",
+          "url": null,
+          "has_written_content": false
+        }
+      ],
+      "summary": "A Yelp-style app scoped to restaurants; the practice problem centers on the same geospatial search plus aggregate-rating problems as general local business review systems."
+    },
+    {
+      "name": "Location History Service",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Location History Service",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Store and query a user's historical location trail (Google Timeline-style); involves efficient time-indexed geospatial storage and range queries."
+    },
+    {
+      "name": "Malware Scanning Service",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Malware Scanning Service",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Scan uploaded files for malware; involves an async scanning pipeline that can hold/quarantine files until a verdict is reached without blocking uploads."
+    },
+    {
+      "name": "NFT Marketplace (OpenSea)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "NFT Marketplace (OpenSea)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Buy/sell/mint unique digital tokens; combines blockchain transaction handling with a conventional marketplace search/listing layer."
+    },
+    {
+      "name": "Nearby Friends",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Nearby Friends",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Share real-time location with a friend list; centers on efficient proximity queries plus privacy-aware, opt-in live location updates."
+    },
+    {
+      "name": "News Aggregator (Google News)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "News Aggregator",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/google-news",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Ingest articles from many publishers, cluster near-duplicate stories, and rank them into topics; involves large-scale ingestion, near-duplicate/clustering detection, and personalized ranking."
+    },
+    {
+      "name": "Newsletter Platform (Substack)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Newsletter Platform (Substack)",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Compose and send newsletters to subscriber lists; centers on high-volume transactional email delivery and subscriber list management."
+    },
+    {
+      "name": "Online Auction",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Online Auction",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/online-auction",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Run time-boxed bidding on items where the highest bid wins; the core challenge is processing concurrent bids with strict ordering and correctness as the auction clock runs out."
+    },
+    {
+      "name": "Online Judge (LeetCode)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "LeetCode",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/leetcode",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design an Online Code Judge",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Accept submitted code, execute it safely against test cases, and return verdicts; the hard parts are sandboxing untrusted code execution and scaling a queue of compute-heavy grading jobs."
+    },
+    {
+      "name": "Password Manager (LastPass)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Password Manager (LastPass)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Securely store and sync user credentials; centers on client-side/zero-knowledge encryption so the server never sees plaintext secrets."
+    },
+    {
+      "name": "Plagiarism Checker (Turnitin)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Plagiarism Checker (Turnitin)",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Detect copied text across a huge corpus of documents; centers on near-duplicate detection using shingling/fingerprinting techniques (similar to search indexing)."
+    },
+    {
+      "name": "Podcast Hosting Platform",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Podcast Hosting Platform",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Host and distribute podcast audio via RSS-like feeds; shares media-storage/CDN concerns with simpler catalog/subscription needs than full video streaming."
+    },
+    {
+      "name": "Price Tracking / Comparison Service",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Price Tracking Service",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/camelcamelcamel",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Price Comparison Engine",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Continuously scrape or ingest prices from external sites/sources, store price history, and alert users on drops; hinges on scalable scheduled scraping/ingestion and efficient time-series storage."
+    },
+    {
+      "name": "Reddit (Discussion Forum)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Reddit (Discussion Forum)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Threaded discussions with voting-based ranking across many communities; centers on scalable comment-tree storage and vote-based ranking algorithms."
+    },
+    {
+      "name": "Smart Home Automation System",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Smart Home Automation System",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Control and monitor connected home devices; involves reliable low-latency device command/telemetry messaging (similar to IoT fleet management at a smaller scale)."
+    },
+    {
+      "name": "Splitwise (Expense Sharing)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Splitwise (Expense Sharing)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Track shared expenses between people and simplify who-owes-whom; the core problem is a debt-simplification algorithm over a graph of pairwise balances."
+    },
+    {
+      "name": "Spotify (Audio Streaming)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Spotify (Audio Streaming)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Stream licensed audio and build playlists/recommendations; involves CDN-backed streaming delivery and a recommendation pipeline over listening history."
+    },
+    {
+      "name": "StackOverflow (Q&A Platform)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "StackOverflow (Q&A Platform)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Ask/answer questions with voting-based ranking; shares Reddit-style vote aggregation with added reputation and duplicate-question detection concerns."
+    },
+    {
+      "name": "Strava / Fitness Tracking",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Strava",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/strava",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Record and share GPS-tracked workout routes and let others react/comment; involves efficient storage of large GPS trace data and computing route-based leaderboards (segments)."
+    },
+    {
+      "name": "Survey System (SurveyMonkey)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Survey System (SurveyMonkey)",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Build surveys and collect/aggregate responses; involves flexible form schema storage and real-time response aggregation."
+    },
+    {
+      "name": "Telemedicine Platform (Practo)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Telemedicine Platform (Practo)",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Book and conduct online doctor consultations; combines appointment scheduling with real-time video-call infrastructure."
+    },
+    {
+      "name": "Ticketmaster / Event Ticket Booking",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Ticketmaster",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/ticketmaster",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Ticketmaster (Booking System)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Sell a limited number of seats for popular events without double-booking or overselling under extreme concurrent demand; centers on reservation locking, queueing, and inventory consistency."
+    },
+    {
+      "name": "Tinder / Location-based Matching",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Tinder",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/tinder",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Tinder (Location-based Matching)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Show nearby candidate profiles and record mutual likes as matches; revolves around efficient proximity queries (geohashing/quadtrees) and avoiding showing the same profile twice."
+    },
+    {
+      "name": "Translation Service (Google Translate)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Translation Service (Google Translate)",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Machine translation at scale; involves routing text to translation models and caching common translations for latency/cost savings."
+    },
+    {
+      "name": "Truecaller (Caller Identification)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Truecaller (Caller Identification)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Identify unknown callers and block spam using crowdsourced number data; centers on a huge lookup index and spam-scoring aggregation."
+    },
+    {
+      "name": "Two-Factor Authentication System (Authy)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Two-Factor Authentication System (Authy)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Provide a second auth factor via SMS/email/TOTP; centers on time-based one-time code generation and reliable multi-channel delivery."
+    },
+    {
+      "name": "Typeahead Suggestion",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Typeahead Suggestion",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Real-time search-as-you-type suggestions; classically solved with a trie or precomputed top-N suggestions per prefix, served from an in-memory index."
+    },
+    {
+      "name": "Unique ID Generator (Snowflake)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Unique ID Generator (Snowflake)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Generate globally unique, roughly time-sortable IDs without central coordination; the classic solution encodes timestamp + worker ID + sequence into one ID."
+    },
+    {
+      "name": "UrbanCompany (Home Services)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "UrbanCompany (Home Services)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Marketplace matching customers with local service professionals; centers on availability/scheduling matching similar to ride-hailing dispatch."
+    },
+    {
+      "name": "Video Transcoding Service",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Video Transcoding Service",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Convert uploaded video into multiple formats/resolutions; centers on a scalable async transcoding job pipeline (similar to the YouTube upload path)."
+    },
+    {
+      "name": "Virtual Private Network (VPN)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Virtual Private Network (VPN)",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Provide secure, private network tunnels for clients; centers on encrypted tunneling protocols and secure key exchange."
+    },
+    {
+      "name": "Virtual Waiting Room",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Virtual Waiting Room",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Queue excess users during traffic surges before admitting them to the main system; centers on fair queueing and controlled admission rate to protect backend capacity."
+    },
+    {
+      "name": "Weather Forecasting System",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Weather Forecasting System",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Ingest sensor/satellite data and serve forecasts; centers on large-scale geospatial data ingestion and serving derived forecast queries efficiently."
+    },
+    {
+      "name": "WhatsApp / Real-time Chat",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "WhatsApp",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/whatsapp",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Chat System (WhatsApp)",
+          "url": "https://www.scalemock.com/hld?page=1",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Deliver one-on-one and group messages in real time with delivery/read receipts; centers on maintaining persistent connections at scale (WebSockets), message ordering, and offline delivery guarantees.",
+      "note": "ScaleMock lists this as Hard; HelloInterview lists it as Medium."
+    },
+    {
+      "name": "Wikipedia (Knowledge Base)",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Wikipedia (Knowledge Base)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A collaboratively edited encyclopedia; involves revision history storage, edit-conflict handling, and read-heavy full-text search."
+    },
+    {
+      "name": "YouTube / Video Streaming",
+      "difficulty": "Medium",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "YouTube",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/youtube",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design YouTube (Video Streaming)",
+          "url": "https://www.scalemock.com/hld?page=1",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Support uploading, transcoding, and streaming video to a huge audience; centers on async transcoding pipelines, adaptive bitrate streaming, and CDN-backed delivery.",
+      "note": "ScaleMock lists this as Hard; HelloInterview lists it as Medium."
+    },
+    {
+      "name": "Ad Click Aggregator",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Ad Click Aggregator",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/ad-click-aggregator",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design an Ad Click Aggregator",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Aggregate huge volumes of ad click/impression events in near real time for billing and analytics; centers on stream processing, windowed aggregation, and exactly-once counting under high write throughput."
+    },
+    {
+      "name": "B-Tree Storage Engine",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "B-Tree Storage Engine",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "The classic storage engine behind Postgres/MySQL; centers on page-based balanced-tree layout optimized for read-heavy, in-place-update workloads."
+    },
+    {
+      "name": "Blockchain Ledger (Bitcoin)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Blockchain Ledger (Bitcoin)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A decentralized, tamper-resistant ledger; centers on consensus among untrusted nodes (proof-of-work) and cryptographic chaining of blocks."
+    },
+    {
+      "name": "Browser Engine (Chrome)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Browser Engine (Chrome)",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "The core rendering engine of a web browser; centers on parsing HTML/CSS into a render tree and efficiently laying out/painting pixels."
+    },
+    {
+      "name": "Build System (Bazel)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Build System (Bazel)",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A hermetic, reproducible build system for large monorepos; centers on dependency-graph-based incremental builds and build caching."
+    },
+    {
+      "name": "CDN (Content Delivery Network)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "CDN (Content Delivery Network)",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Serve static assets with low latency worldwide; involves edge cache placement, origin fetch/invalidation, and request routing to the nearest healthy edge node."
+    },
+    {
+      "name": "CI/CD Pipeline (GitHub Actions)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "GitHub Actions",
+          "url": null,
+          "has_written_content": false
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a CI/CD Pipeline Service",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Run arbitrary build/test/deploy workflows triggered by code changes; centers on a scalable, isolated (containerized) job execution fleet and a DAG-based workflow scheduler."
+    },
+    {
+      "name": "Canva (Online Graphic Design)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Canva (Online Graphic Design)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Collaborative design canvas with many asset types; shares real-time collaboration concerns with Google Docs, plus asset/version management."
+    },
+    {
+      "name": "Change Data Capture (CDC) System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Change Data Capture (CDC) System",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Propagate database changes to downstream systems in real time; centers on reading a database's write-ahead log and reliably streaming change events."
+    },
+    {
+      "name": "ChatGPT-style LLM Serving",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "ChatGPT",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/chatgpt",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Serve a conversational AI product to a huge user base; involves streaming token-by-token responses, GPU inference fleet scaling/batching, and managing long conversation context."
+    },
+    {
+      "name": "CodeSandbox (Online IDE)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "CodeSandbox (Online IDE)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "In-browser code editing and execution; centers on sandboxed/isolated code execution environments and real-time preview updates."
+    },
+    {
+      "name": "Collaborative Whiteboard (Miro)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Collaborative Whiteboard (Miro)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Real-time shared canvas of shapes/drawings; another CRDT/OT-style real-time sync problem, similar in spirit to Google Docs but for spatial objects."
+    },
+    {
+      "name": "Crowdfunding / Donations Platform",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Donations Website",
+          "url": null,
+          "has_written_content": false
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Crowdfunding Platform (Kickstarter)",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Let creators collect pledges toward a funding goal with a deadline; the tricky part is handling payment capture/refunds correctly if a goal isn't met, under concurrent pledges.",
+      "note": "ScaleMock lists this as Medium; HelloInterview's related practice problem is rated Hard."
+    },
+    {
+      "name": "DDoS Protection System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "DDoS Protection System",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Detect and absorb distributed denial-of-service traffic; centers on traffic anomaly detection and massive scrubbing capacity at the network edge."
+    },
+    {
+      "name": "DFS Metadata Service (NameNode)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "DFS Metadata Service (NameNode)",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "The metadata component of a distributed file system (HDFS-style); centers on tracking file-to-block-to-node mappings and coordinating replication/recovery."
+    },
+    {
+      "name": "Data Lakehouse (Delta Lake)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Data Lakehouse (Delta Lake)",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Bring ACID transactions to big-data storage on object stores; centers on a transaction log layered over immutable files in blob storage."
+    },
+    {
+      "name": "Digital Wallet",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Digital Wallet",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Peer-to-peer money transfer app; shares payment-system concerns (idempotency, ledger consistency) with added focus on wallet balance management."
+    },
+    {
+      "name": "Discord (Voice & Chat)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Discord (Voice & Chat)",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Persistent community text/voice servers at scale; combines real-time chat fan-out with low-latency voice routing similar to a chat + video-conferencing hybrid."
+    },
+    {
+      "name": "Distributed Configuration System (Etcd)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed Configuration System (Etcd)",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Strongly consistent config/service-discovery store; centers on consensus (Raft) to keep a small amount of critical config consistent cluster-wide."
+    },
+    {
+      "name": "Distributed File System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed File System",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "An HDFS/GFS-style system for storing huge datasets across machines; centers on chunked storage, replication, and a metadata service tracking chunk locations."
+    },
+    {
+      "name": "Distributed Key-Value Store",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed Key-Value Store",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A DynamoDB/Cassandra-style store; centers on consistent hashing for partitioning, replication, and tunable consistency (quorum reads/writes)."
+    },
+    {
+      "name": "Distributed Lock Manager",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed Lock Manager",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A Chubby/Zookeeper-style coordination service; centers on consensus (Paxos/Raft) for leader election and fault-tolerant distributed locks."
+    },
+    {
+      "name": "Distributed SQL Database (CockroachDB)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed SQL Database (CockroachDB)",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A horizontally-scalable SQL database with strong consistency; centers on distributed transactions (e.g. Raft-replicated ranges) while preserving ACID semantics."
+    },
+    {
+      "name": "Distributed Tracing System (Jaeger)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed Tracing System (Jaeger)",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Trace a request as it flows across microservices; involves span collection, sampling strategies, and reconstructing full traces from distributed spans."
+    },
+    {
+      "name": "Distributed Transaction Manager",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Distributed Transaction Manager",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Coordinate transactions across multiple microservices; centers on two-phase commit versus saga-based compensating-transaction patterns."
+    },
+    {
+      "name": "Domain Name System (DNS)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Domain Name System (DNS)",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Resolve hostnames to IP addresses hierarchically; involves a globally distributed, heavily cached, eventually-consistent lookup hierarchy."
+    },
+    {
+      "name": "Facebook Post Search",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "FB Post Search",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/fb-post-search",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Full-text search over billions of social posts with strict privacy/visibility rules per viewer; the hard part is combining a scalable inverted-index search layer with per-query access-control filtering."
+    },
+    {
+      "name": "Flash Sale System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Flash Sale System",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Handle extreme concurrency against very limited inventory for short sale windows; centers on avoiding overselling under massive simultaneous demand (queueing, inventory reservation)."
+    },
+    {
+      "name": "Garbage Collector",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Garbage Collector",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Automatic memory management for a language runtime; centers on tracing-based reachability algorithms (mark-sweep, generational, concurrent collectors)."
+    },
+    {
+      "name": "Generic Recommendation System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Generic Recommendation System",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Serve personalized content recommendations; involves offline model training combined with a low-latency online serving/ranking layer."
+    },
+    {
+      "name": "GitHub (Version Control Hosting)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "GitHub (Version Control Hosting)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Host Git repositories at scale; centers on efficient storage of the Git object model and scaling repository read/write operations."
+    },
+    {
+      "name": "Gmail (Email Service)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Gmail (Email Service)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Send/receive/store email at scale; involves reliable message delivery (SMTP-like queuing), large mailbox storage, and full-text search over messages."
+    },
+    {
+      "name": "Google Calendar (Scheduling)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Google Calendar (Scheduling)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Manage events, recurring schedules, and free/busy lookups across users; centers on efficient recurring-event expansion and conflict-free scheduling queries."
+    },
+    {
+      "name": "Google Docs / Collaborative Editing",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Google Docs",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/google-docs",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Google Docs (Collaborative Editing)",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Allow many users to edit the same document simultaneously and converge on the same result; the classic solutions are Operational Transformation or CRDTs plus real-time sync over WebSockets."
+    },
+    {
+      "name": "Google Maps (Location Service)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Google Maps (Location Service)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Provide maps, geocoding, and turn-by-turn routing; the hard part is efficient graph-based shortest-path routing over a planet-scale road network plus live traffic data."
+    },
+    {
+      "name": "Google Photos (Cloud Photo Storage)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Google Photos (Cloud Photo Storage)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Store and organize large photo/video libraries with search; shares blob-storage concerns with Dropbox plus ML-driven content search (faces, objects)."
+    },
+    {
+      "name": "Graph Database (Neo4j)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Graph Database (Neo4j)",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Store and traverse richly connected data; centers on storage layouts optimized for graph traversal rather than tabular joins."
+    },
+    {
+      "name": "IRCTC (Railway Booking)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "IRCTC (Railway Booking)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Handle extreme traffic spikes (Tatkal-style rushes) for a fixed seat inventory; shares flash-sale-style overselling concerns under massive simultaneous demand."
+    },
+    {
+      "name": "Identity Provider (Auth0)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Identity Provider (Auth0)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Centralized identity and access management (SSO); involves implementing standard auth protocols (OAuth/OIDC/SAML) and token issuance/validation at scale."
+    },
+    {
+      "name": "IoT Fleet Management System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "IoT Fleet Management System",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Monitor and manage many remote IoT devices; involves high-volume device telemetry ingestion and reliable command/control messaging to devices."
+    },
+    {
+      "name": "JavaScript Runtime (Node.js)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "JavaScript Runtime (Node.js)",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "An async, event-driven JS runtime; centers on the single-threaded event loop model and non-blocking I/O scheduling."
+    },
+    {
+      "name": "LSM Tree Storage Engine",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "LSM Tree Storage Engine",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "The write-optimized storage engine behind RocksDB/Cassandra; centers on memtable + sorted-run compaction design tradeoffs between write and read amplification."
+    },
+    {
+      "name": "LinkedIn (Professional Network)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "LinkedIn (Professional Network)",
+          "url": "https://www.scalemock.com/hld?page=7",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A professional social graph with feeds and connection requests; combines social-graph storage with feed ranking similar to News Feed-style problems."
+    },
+    {
+      "name": "Live Streaming Platform (Twitch)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Live Streaming Platform (Twitch)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Real-time video ingestion from broadcasters fanned out to many viewers; shares transcoding/CDN concerns with YouTube plus much lower end-to-end latency requirements."
+    },
+    {
+      "name": "Load Balancer (NGINX)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Load Balancer (NGINX)",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A high-performance reverse proxy/load balancer; centers on connection handling models and load-balancing algorithms (round robin, least-connections, consistent hashing)."
+    },
+    {
+      "name": "MapReduce Framework",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "MapReduce Framework",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A batch distributed-processing framework; centers on splitting work into map/reduce stages, shuffling intermediate data, and fault-tolerant re-execution of failed tasks."
+    },
+    {
+      "name": "Message Queue (Kafka)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Message Queue (Kafka)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A distributed log-based pub/sub system; centers on partitioned, ordered, replicated logs with consumer offset tracking."
+    },
+    {
+      "name": "Metrics Monitoring & Alerting",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Metrics Monitoring",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/metrics-monitoring",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Metrics Monitoring System",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Collect, store, and query huge volumes of time-series metrics and trigger alerts; relies on efficient time-series storage/compression and a scalable ingestion + query path."
+    },
+    {
+      "name": "Object Storage Service (Amazon S3)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Object Storage Service (Amazon S3)",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Durable, scalable blob storage; centers on data replication/erasure coding for durability and a metadata layer for object lookup."
+    },
+    {
+      "name": "Onion Routing Network (Tor)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Onion Routing Network (Tor)",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Anonymous communication via layered encryption across relays; centers on multi-hop circuit construction where no single relay knows both source and destination."
+    },
+    {
+      "name": "Online Chess",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Online Chess",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/online-chess",
+          "has_written_content": true
+        }
+      ],
+      "summary": "Match players in real time and referee a live game with move validation; centers on low-latency bidirectional game state sync and reliable reconnect/resume handling."
+    },
+    {
+      "name": "Payment Processing System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Payment System",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/payment-system",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Payment Gateway (Stripe)",
+          "url": "https://www.scalemock.com/hld?page=3",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Move money between parties reliably; the central concerns are idempotency for retried requests, strong consistency/auditability of ledger state, and integrating with external banking rails."
+    },
+    {
+      "name": "Peer-to-Peer File Sharing (BitTorrent)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Peer-to-Peer File Sharing (BitTorrent)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Decentralized file distribution among peers; centers on chunked file exchange, peer discovery (trackers/DHT), and tit-for-tat incentive mechanisms."
+    },
+    {
+      "name": "Pinterest (Visual Discovery)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Pinterest (Visual Discovery)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "An image-discovery feed with boards/pins; combines image storage/CDN delivery with a recommendation-driven discovery feed."
+    },
+    {
+      "name": "Platform as a Service (Heroku)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Platform as a Service (Heroku)",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Build/run/deploy arbitrary apps in the cloud; centers on container orchestration, build pipelines, and multi-tenant resource isolation."
+    },
+    {
+      "name": "Privacy-Preserving Analytics System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Privacy-Preserving Analytics System",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Collect usage analytics without exposing individual user data; centers on differential-privacy techniques (noise injection, aggregation) applied to raw event data."
+    },
+    {
+      "name": "Push Notification System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Notification System",
+          "url": null,
+          "has_written_content": false
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Notification System",
+          "url": "https://www.scalemock.com/hld?page=1",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Deliver notifications to millions of users across channels (push, email, SMS); the key problems are per-channel fan-out at scale, user preference/throttling rules, and delivery retries.",
+      "note": "ScaleMock lists this as Medium; HelloInterview's related practice problem is rated Hard."
+    },
+    {
+      "name": "Real-time Ad Bidding System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Real-time Ad Bidding System",
+          "url": "https://www.scalemock.com/hld?page=9",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A programmatic ad auction that must respond within tens of milliseconds; centers on extremely tight-latency bid evaluation across many concurrent auctions."
+    },
+    {
+      "name": "Real-time Collaborative Spreadsheet",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Real-time Collaborative Spreadsheet",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A Google Sheets-style shared spreadsheet; adds formula dependency-graph recalculation on top of the usual real-time collaborative-editing (CRDT/OT) problem."
+    },
+    {
+      "name": "Real-time Fraud Detection System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Real-time Fraud Detection System",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Score and block fraudulent transactions as they happen; centers on low-latency feature computation and rule/ML scoring within the transaction path."
+    },
+    {
+      "name": "Robinhood / Stock Trading",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Robinhood",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/robinhood",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Robinhood (Stock Trading App)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Let users view live market data and place trades; centers on fanning out fast-changing price ticks to many subscribers and handling order placement with strong consistency guarantees."
+    },
+    {
+      "name": "Secrets Management System (Vault)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Secrets Management System (Vault)",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Securely store and grant access to secrets (API keys, certs); centers on encryption-at-rest, fine-grained access policies, and short-lived dynamic credentials."
+    },
+    {
+      "name": "Serverless Compute Platform (AWS Lambda)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Serverless Compute Platform (AWS Lambda)",
+          "url": "https://www.scalemock.com/hld?page=10",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Run code on-demand in response to events; the hard part is fast cold-start container provisioning and per-invocation isolation at scale."
+    },
+    {
+      "name": "Service Mesh (Istio)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Service Mesh (Istio)",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Infrastructure layer for service-to-service traffic; centers on sidecar proxy architecture for routing, retries, and observability without app code changes."
+    },
+    {
+      "name": "Stock Exchange",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Stock Exchange",
+          "url": "https://www.scalemock.com/hld?page=4",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A matching engine for buy/sell orders; the hard part is a deterministic, low-latency order-matching algorithm plus durable, auditable trade logs."
+    },
+    {
+      "name": "Supply Chain Management System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Supply Chain Management System",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Track goods from manufacturing to delivery; centers on modeling multi-stage state transitions and providing end-to-end shipment traceability."
+    },
+    {
+      "name": "Time-Series Database (InfluxDB)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Time-Series Database (InfluxDB)",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Optimized storage/queries for timestamped metrics; centers on write-optimized storage layout, compression, and time-windowed aggregation queries."
+    },
+    {
+      "name": "Top-K / Trending Elements",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "YouTube Top K",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/top-k",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Top-K Frequent Elements Service",
+          "url": "https://www.scalemock.com/hld?page=5",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Continuously surface the most frequent items (views, hashtags) from a high-volume real-time stream; relies on approximate counting structures (count-min sketch, heavy hitters) and windowed aggregation.",
+      "note": "ScaleMock lists this as Medium; HelloInterview lists it as Hard."
+    },
+    {
+      "name": "Traffic Control System",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Traffic Control System",
+          "url": "https://www.scalemock.com/hld?page=12",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Optimize smart-city traffic light flow; involves real-time sensor ingestion and a control loop that adjusts signals based on live conditions."
+    },
+    {
+      "name": "Uber / Ride Hailing",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Uber",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/uber",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design Uber (Ride Hailing)",
+          "url": "https://www.scalemock.com/hld?page=1",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Match nearby riders and drivers in real time and track trips; the hard problems are efficient proximity search over moving drivers, matching under contention, and consistent trip-state updates."
+    },
+    {
+      "name": "VPN Protocol (WireGuard)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "VPN Protocol (WireGuard)",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A modern, minimal VPN protocol; centers on efficient cryptographic handshakes and low-overhead encrypted tunneling."
+    },
+    {
+      "name": "Vector Database (Pinecone)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Vector Database (Pinecone)",
+          "url": "https://www.scalemock.com/hld?page=13",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Store and query high-dimensional embedding vectors; centers on approximate nearest-neighbor indexing (e.g. HNSW) for fast similarity search."
+    },
+    {
+      "name": "Virtual Machine (JVM)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Virtual Machine (JVM)",
+          "url": "https://www.scalemock.com/hld?page=15",
+          "has_written_content": false
+        }
+      ],
+      "summary": "A process VM executing bytecode; centers on bytecode interpretation/JIT compilation and automatic memory management."
+    },
+    {
+      "name": "Web Application Firewall (WAF)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Web Application Firewall (WAF)",
+          "url": "https://www.scalemock.com/hld?page=11",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Inspect and filter malicious HTTP traffic in the request path; centers on low-latency rule/pattern matching against a stream of live requests."
+    },
+    {
+      "name": "Web Crawler",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "HelloInterview",
+          "title": "Web Crawler",
+          "url": "https://www.hellointerview.com/learn/system-design/problem-breakdowns/web-crawler",
+          "has_written_content": true
+        },
+        {
+          "site": "ScaleMock",
+          "title": "Design a Web Crawler",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Crawl and index a large portion of the web; the core problems are URL frontier management, politeness/dedup at scale, and distributing crawl work across many workers."
+    },
+    {
+      "name": "Web Search Engine (Google Search)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Web Search Engine (Google Search)",
+          "url": "https://www.scalemock.com/hld?page=8",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Index the web and rank results for a query; combines a distributed crawler, an inverted-index build pipeline, and a relevance-ranking layer."
+    },
+    {
+      "name": "Workflow Orchestration Engine (Airflow)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Workflow Orchestration Engine (Airflow)",
+          "url": "https://www.scalemock.com/hld?page=14",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Author, schedule, and monitor multi-step data workflows; centers on DAG-based scheduling with retries, backfills, and dependency management."
+    },
+    {
+      "name": "Zepto (Quick Commerce)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Zepto (Quick Commerce)",
+          "url": "https://www.scalemock.com/hld?page=6",
+          "has_written_content": false
+        }
+      ],
+      "summary": "10-minute grocery delivery; a tighter-SLA variant of local delivery/dispatch problems, emphasizing dark-store inventory and very fast courier assignment."
+    },
+    {
+      "name": "Zoom (Video Conferencing)",
+      "difficulty": "Hard",
+      "sources": [
+        {
+          "site": "ScaleMock",
+          "title": "Zoom (Video Conferencing)",
+          "url": "https://www.scalemock.com/hld?page=2",
+          "has_written_content": false
+        }
+      ],
+      "summary": "Real-time multi-party audio/video calls; centers on low-latency media routing (SFU/MCU architectures), NAT traversal, and adaptive bitrate under variable network conditions."
+    }
+  ]
+}

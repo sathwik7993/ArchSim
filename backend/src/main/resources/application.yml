@@ -1,0 +1,19 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/archsim}
+    username: ${DATABASE_USER:archsim}
+    password: ${DATABASE_PASSWORD:archsim}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+
+server:
+  port: ${PORT:8080}
+
+archsim:
+  security:
+    token-secret: ${ARCHSIM_TOKEN_SECRET:local-development-secret-change-me}
+
