@@ -6,11 +6,10 @@ import { getRefArch } from '../data/refarch';
 import { useProgress } from '../state/progress';
 import { useCanvasStore } from '../state/canvasStore';
 import { ArchitectureDiagram } from './ArchitectureDiagram';
-import { EvaluateTab } from './EvaluateTab';
 import { Icon } from './icons';
 import { CATEGORY_COLOR, CATEGORY_MAP, type ComponentType } from '../types/graph';
 
-type Tab = 'description' | 'hints' | 'solution' | 'evaluate';
+type Tab = 'description' | 'hints' | 'solution';
 
 interface Props {
   slug: string;
@@ -91,7 +90,6 @@ export function ProblemPanel({ slug, onCollapse, onToast }: Props) {
         <button role="tab" aria-selected={tab === 'description'} className={`pd-tab ${tab === 'description' ? 'active' : ''}`} onClick={() => setTab('description')}>Description</button>
         <button role="tab" aria-selected={tab === 'hints'} className={`pd-tab ${tab === 'hints' ? 'active' : ''}`} onClick={() => setTab('hints')}>Hints <span className="tab-count">{solution.hints.length}</span></button>
         <button role="tab" aria-selected={tab === 'solution'} className={`pd-tab ${tab === 'solution' ? 'active' : ''}`} onClick={goSolution}>Solution {revealed ? <span className="tab-unlocked">✓</span> : <span className="tab-lock">🔒</span>}</button>
-        <button role="tab" aria-selected={tab === 'evaluate'} className={`pd-tab ${tab === 'evaluate' ? 'active' : ''}`} onClick={() => setTab('evaluate')}>Evaluate <span className="tab-spark">✦</span></button>
       </div>
 
       <div className="pp-body">
@@ -192,8 +190,6 @@ export function ProblemPanel({ slug, onCollapse, onToast }: Props) {
             )}
           </div>
         )}
-
-        {tab === 'evaluate' && <EvaluateTab problem={problem} solution={solution} />}
       </div>
 
       {confirmOpen && (

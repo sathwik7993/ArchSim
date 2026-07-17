@@ -71,11 +71,19 @@ export function NodePalette() {
                         key={type}
                         className="palette-btn"
                         style={{ ['--cat-color' as string]: color }}
+                        draggable
+                        onDragStart={(e) => {
+                          e.dataTransfer.setData('application/archsim-component', type);
+                          e.dataTransfer.effectAllowed = 'copy';
+                        }}
                         onClick={() => addNode(type)}
-                        title={`Add ${label} to the canvas`}
+                        title={`Drag onto the canvas, or click to add ${label}`}
                       >
                         <span className="p-icon"><Icon type={type} size={18} /></span>
                         <span>{label}</span>
+                        <span className="p-grip" aria-hidden="true">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><circle cx="8" cy="6" r="1.6"/><circle cx="8" cy="12" r="1.6"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="6" r="1.6"/><circle cx="16" cy="12" r="1.6"/><circle cx="16" cy="18" r="1.6"/></svg>
+                        </span>
                       </button>
                     );
                   })}

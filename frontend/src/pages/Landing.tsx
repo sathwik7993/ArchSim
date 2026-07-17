@@ -40,9 +40,9 @@ const FEATURES: Feature[] = [
     body: 'Scrub a timeline, scale traffic live, inject chaos (CPU spike, memory leak, packet loss, node kill) and read the distributed-trace latency waterfall.',
   },
   {
-    icon: S('M12 3l2.2 5.6L20 9l-4.5 3.9L17 19l-5-3.2L7 19l1.5-6.1L4 9l5.8-.4z'),
-    title: 'AI design evaluation',
-    body: 'Bring your own free Google Gemini key and get a scored review of your architecture — bottlenecks, single points of failure and missing pieces.',
+    icon: S('M4 19V5m0 14h16M8 15l3-4 3 3 4-6'),
+    title: 'Design insights',
+    body: 'See an estimated monthly cost broken down by component and a live SLO budget — critical-path latency, error rate and peak saturation — as you simulate.',
   },
   {
     icon: S('M4 4h7v7H4z|M13 4h7v7h-7z|M4 13h7v7H4z|M13 13h7v7h-7z'),
@@ -56,7 +56,7 @@ const STEPS: Step[] = [
   { n: '01', title: 'Design', body: 'Drop components onto the canvas and wire them together.' },
   { n: '02', title: 'Simulate', body: 'Run traffic and watch it flow against real capacity limits.' },
   { n: '03', title: 'Diagnose', body: 'Inject chaos and trace latency to find the bottleneck.' },
-  { n: '04', title: 'Evaluate', body: 'Get AI feedback and iterate toward a stronger design.' },
+  { n: '04', title: 'Compare', body: 'Check your design against the reference architecture and iterate toward a stronger one.' },
 ];
 
 export function Landing() {

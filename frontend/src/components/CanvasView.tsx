@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useCanvasStore } from '../state/canvasStore';
 import { autoscales, baseUnits } from '../sim/engine';
-import { CATEGORY_COLOR, CATEGORY_MAP } from '../types/graph';
+import { CATEGORY_COLOR, CATEGORY_MAP, type ComponentType } from '../types/graph';
 import { Icon } from './icons';
 import { Timeline } from './Timeline';
 import { TraceViewer } from './TraceViewer';
 import { InsightsPanel } from './InsightsPanel';
+import { SimulationReport } from './SimulationReport';
 
 const NODE_WIDTH = 200;
 const NODE_HEIGHT = 80;
@@ -16,6 +17,7 @@ export function CanvasView() {
   const selectedNodeId = useCanvasStore((state) => state.selectedNodeId);
   const selectNode = useCanvasStore((state) => state.selectNode);
   const moveNode = useCanvasStore((state) => state.moveNode);
+  const addNode = useCanvasStore((state) => state.addNode);
   const addLink = useCanvasStore((state) => state.addLink);
   const linkMode = useCanvasStore((state) => state.linkMode);
   const linkSource = useCanvasStore((state) => state.linkSource);
@@ -30,6 +32,8 @@ export function CanvasView() {
   const currentFrame = useCanvasStore((state) => state.currentFrame);
   const toggleTrace = useCanvasStore((state) => state.toggleTrace);
   const showTrace = useCanvasStore((state) => state.showTrace);
+  const toggleReport = useCanvasStore((state) => state.toggleReport);
+  const showReport = useCanvasStore((state) => state.showReport);
   const trafficLevel = useCanvasStore((state) => state.trafficLevel);
   const setTrafficLevel = useCanvasStore((state) => state.setTrafficLevel);
 
@@ -60,6 +64,7 @@ export function CanvasView() {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 }); // In transform space
   const [editingNodeId, setEditingNodeId] = useState<string | null>(null);
   const [isPanning, setIsPanning] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Quick lookup table
   const nodeById = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
@@ -327,6 +332,26 @@ export function CanvasView() {
   }, [nodes, pan, zoom]);
 
   // Map a 0..1 saturation to a status class used for colour/animation.
+  // Drag-and-drop a component from the palette onto the canvas.
+  const handleDragOver = (e: React.DragEvent) => {
+    if (!e.dataTransfer.types.includes('application/archsim-component')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    if (!isDragOver) setIsDragOver(true);
+  };
+  const handleDragLeave = (e: React.DragEvent) => {
+    // Only clear when the pointer actually leaves the container (not child nodes).
+    if (e.currentTarget === e.target) setIsDragOver(false);
+  };
+  const handleDrop = (e: React.DragEvent) => {
+    const type = e.dataTransfer.getData('application/archsim-component');
+    setIsDragOver(false);
+    if (!type) return;
+    e.preventDefault();
+    const pt = screenToCanvas(e.clientX, e.clientY);
+    addNode(type as ComponentType, pt.x - NODE_WIDTH / 2, pt.y - NODE_HEIGHT / 2);
+  };
+
   const satClass = (sat: number) => (sat >= 0.9 ? 'sim-crit' : sat >= 0.6 ? 'sim-warn' : 'sim-ok');
   // Map CPU load (0..100) to a status class for node glow.
   const cpuClass = (cpu: number) => (cpu >= 90 ? 'sim-crit' : cpu >= 60 ? 'sim-warn' : 'sim-ok');
@@ -334,10 +359,13 @@ export function CanvasView() {
   return (
     <div
       ref={containerRef}
-      className={`canvas-container ${linkMode || linkSource ? 'link-mode-active' : ''} ${isPanning ? 'panning' : ''}`}
+      className={`canvas-container ${linkMode || linkSource ? 'link-mode-active' : ''} ${isPanning ? 'panning' : ''} ${isDragOver ? 'drag-over' : ''}`}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseDown={handleCanvasMouseDown}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
     >
       <div
         className="canvas-transform-layer"
@@ -541,6 +569,14 @@ export function CanvasView() {
           >
             ⧉ Trace
           </button>
+          <button
+            className="sim-stop-btn"
+            onClick={toggleReport}
+            style={showReport ? { color: 'var(--accent)', borderColor: 'var(--accent-border)' } : undefined}
+            title="Per-second simulation report"
+          >
+            ▤ Report
+          </button>
           <button className="sim-stop-btn" onClick={stopSimulation} title="Stop simulation">
             ■ Stop
           </button>
@@ -549,6 +585,9 @@ export function CanvasView() {
 
       {/* Cost + SLO insights drawer */}
       <InsightsPanel />
+
+      {/* Per-second simulation report */}
+      <SimulationReport />
 
       {/* Distributed trace waterfall */}
       <TraceViewer />

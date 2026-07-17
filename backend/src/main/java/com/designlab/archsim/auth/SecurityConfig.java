@@ -42,7 +42,6 @@ public class SecurityConfig {
             .requestMatchers("/error").permitAll()
             .requestMatchers("/api/v1/auth/**", "/ws/**").permitAll()
             .requestMatchers("/api/v1/problems/**").permitAll()
-            .requestMatchers("/api/v1/evaluate", "/api/v1/evaluate/**").permitAll()
             .anyRequest().authenticated())
         .addFilterBefore(new BearerTokenFilter(tokenService), UsernamePasswordAuthenticationFilter.class)
         .build();

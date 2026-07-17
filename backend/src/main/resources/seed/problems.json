@@ -335,7 +335,7 @@
       ]
     },
     "refArch": {
-      "caption": "Metadata path (top) is small and DB-backed; the bytes path (bottom) goes to object storage fronted by a CDN — app servers never touch file data.",
+      "caption": "Metadata (top) is small and DB-backed; file blocks (bottom) go straight to object storage fronted by a CDN. A sync event stream notifies other devices.",
       "nodes": [
         {
           "id": "client",
@@ -346,7 +346,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 300,
+            "qps": 400,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -366,25 +366,11 @@
           }
         },
         {
-          "id": "lb",
-          "type": "LOAD_BALANCER",
-          "label": "Load Balancer",
-          "position": {
-            "x": 330,
-            "y": 90
-          },
-          "properties": {
-            "algorithm": "round_robin",
-            "health_check_interval": 30,
-            "max_connections": 10000
-          }
-        },
-        {
-          "id": "app",
+          "id": "meta",
           "type": "SERVER",
           "label": "Metadata Svc",
           "position": {
-            "x": 470,
+            "x": 350,
             "y": 90
           },
           "properties": {
@@ -398,9 +384,9 @@
         {
           "id": "pg",
           "type": "POSTGRESQL",
-          "label": "Metadata DB",
+          "label": "File Metadata",
           "position": {
-            "x": 610,
+            "x": 510,
             "y": 90
           },
           "properties": {
@@ -415,7 +401,7 @@
           "type": "CDN",
           "label": "CDN",
           "position": {
-            "x": 250,
+            "x": 230,
             "y": 300
           },
           "properties": {
@@ -426,15 +412,30 @@
         {
           "id": "s3",
           "type": "S3_BUCKET",
-          "label": "Blob Storage",
+          "label": "Block Store",
           "position": {
-            "x": 430,
+            "x": 410,
             "y": 300
           },
           "properties": {
             "versioning": true,
             "encryption": "AES-256",
             "storage_class": "STANDARD"
+          }
+        },
+        {
+          "id": "notif",
+          "type": "KAFKA",
+          "label": "Sync Events",
+          "position": {
+            "x": 590,
+            "y": 300
+          },
+          "properties": {
+            "brokers": 3,
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168
           }
         }
       ],
@@ -449,26 +450,17 @@
           }
         },
         {
-          "id": "l-api-lb",
+          "id": "l-api-meta",
           "source": "api",
-          "target": "lb",
+          "target": "meta",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-lb-app",
-          "source": "lb",
-          "target": "app",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-app-pg",
-          "source": "app",
+          "id": "l-meta-pg",
+          "source": "meta",
           "target": "pg",
           "properties": {
             "latencyMs": 4,
@@ -494,9 +486,18 @@
           }
         },
         {
-          "id": "l-app-s3",
-          "source": "app",
+          "id": "l-meta-s3",
+          "source": "meta",
           "target": "s3",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-meta-notif",
+          "source": "meta",
+          "target": "notif",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -1295,7 +1296,7 @@
       ]
     },
     "refArch": {
-      "caption": "Metadata path (top) is small and DB-backed; the bytes path (bottom) goes to object storage fronted by a CDN — app servers never touch file data.",
+      "caption": "Small pastes are metadata + blob: hot pastes are cached, metadata sits in a relational DB, the body goes to object storage, and reads are served through a CDN.",
       "nodes": [
         {
           "id": "client",
@@ -1306,7 +1307,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 300,
+            "qps": 600,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -1326,25 +1327,11 @@
           }
         },
         {
-          "id": "lb",
-          "type": "LOAD_BALANCER",
-          "label": "Load Balancer",
-          "position": {
-            "x": 330,
-            "y": 90
-          },
-          "properties": {
-            "algorithm": "round_robin",
-            "health_check_interval": 30,
-            "max_connections": 10000
-          }
-        },
-        {
           "id": "app",
           "type": "SERVER",
-          "label": "Metadata Svc",
+          "label": "Paste Svc",
           "position": {
-            "x": 470,
+            "x": 340,
             "y": 90
           },
           "properties": {
@@ -1356,37 +1343,38 @@
           }
         },
         {
-          "id": "pg",
-          "type": "POSTGRESQL",
-          "label": "Metadata DB",
+          "id": "cache",
+          "type": "REDIS",
+          "label": "Hot Pastes",
           "position": {
-            "x": 610,
-            "y": 90
+            "x": 500,
+            "y": 70
+          },
+          "properties": {
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
+          }
+        },
+        {
+          "id": "db",
+          "type": "POSTGRESQL",
+          "label": "Paste Metadata",
+          "position": {
+            "x": 500,
+            "y": 190
           },
           "properties": {
             "version": "16",
             "max_connections": 100,
             "storage_gb": 50,
-            "replication": true
-          }
-        },
-        {
-          "id": "cdn",
-          "type": "CDN",
-          "label": "CDN",
-          "position": {
-            "x": 250,
-            "y": 300
-          },
-          "properties": {
-            "cache_ttl_seconds": 3600,
-            "edge_locations": 50
+            "replication": false
           }
         },
         {
           "id": "s3",
           "type": "S3_BUCKET",
-          "label": "Blob Storage",
+          "label": "Blob Store",
           "position": {
             "x": 430,
             "y": 300
@@ -1395,6 +1383,19 @@
             "versioning": true,
             "encryption": "AES-256",
             "storage_class": "STANDARD"
+          }
+        },
+        {
+          "id": "cdn",
+          "type": "CDN",
+          "label": "CDN",
+          "position": {
+            "x": 230,
+            "y": 300
+          },
+          "properties": {
+            "cache_ttl_seconds": 3600,
+            "edge_locations": 50
           }
         }
       ],
@@ -1409,17 +1410,8 @@
           }
         },
         {
-          "id": "l-api-lb",
+          "id": "l-api-app",
           "source": "api",
-          "target": "lb",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-lb-app",
-          "source": "lb",
           "target": "app",
           "properties": {
             "latencyMs": 4,
@@ -1427,9 +1419,27 @@
           }
         },
         {
-          "id": "l-app-pg",
+          "id": "l-app-cache",
           "source": "app",
-          "target": "pg",
+          "target": "cache",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-app-db",
+          "source": "app",
+          "target": "db",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-app-s3",
+          "source": "app",
+          "target": "s3",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -1447,15 +1457,6 @@
         {
           "id": "l-cdn-s3",
           "source": "cdn",
-          "target": "s3",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-app-s3",
-          "source": "app",
           "target": "s3",
           "properties": {
             "latencyMs": 4,
@@ -2155,7 +2156,7 @@
       ]
     },
     "refArch": {
-      "caption": "Shard the primitive by key so no single node is a hotspot; hot state lives in memory with optional durable backing.",
+      "caption": "Writes generate a short key (counter/base62) and store the mapping; reads hit a cache first and fall through to a key-value store. Click events stream off for analytics.",
       "nodes": [
         {
           "id": "client",
@@ -2163,10 +2164,10 @@
           "label": "Client",
           "position": {
             "x": 40,
-            "y": 180
+            "y": 190
           },
           "properties": {
-            "qps": 1000,
+            "qps": 1200,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -2174,10 +2175,10 @@
         {
           "id": "api",
           "type": "API_GATEWAY",
-          "label": "API",
+          "label": "API Gateway",
           "position": {
-            "x": 190,
-            "y": 180
+            "x": 180,
+            "y": 190
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -2186,12 +2187,26 @@
           }
         },
         {
+          "id": "lb",
+          "type": "LOAD_BALANCER",
+          "label": "Load Balancer",
+          "position": {
+            "x": 315,
+            "y": 190
+          },
+          "properties": {
+            "algorithm": "round_robin",
+            "health_check_interval": 30,
+            "max_connections": 10000
+          }
+        },
+        {
           "id": "app",
           "type": "SERVER",
-          "label": "Service",
+          "label": "Shortener Svc",
           "position": {
-            "x": 340,
-            "y": 180
+            "x": 450,
+            "y": 190
           },
           "properties": {
             "cpu_cores": 4,
@@ -2204,10 +2219,10 @@
         {
           "id": "redis",
           "type": "REDIS",
-          "label": "In-memory State",
+          "label": "Hot Cache",
           "position": {
-            "x": 500,
-            "y": 90
+            "x": 600,
+            "y": 80
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -2216,18 +2231,32 @@
           }
         },
         {
-          "id": "pg",
-          "type": "POSTGRESQL",
-          "label": "Durable Backing",
+          "id": "ddb",
+          "type": "DYNAMODB",
+          "label": "URL Store",
           "position": {
-            "x": 500,
-            "y": 280
+            "x": 600,
+            "y": 200
           },
           "properties": {
-            "version": "16",
-            "max_connections": 100,
-            "storage_gb": 50,
-            "replication": false
+            "read_capacity": 5,
+            "write_capacity": 5,
+            "billing_mode": "PROVISIONED"
+          }
+        },
+        {
+          "id": "kafka",
+          "type": "KAFKA",
+          "label": "Click Events",
+          "position": {
+            "x": 600,
+            "y": 320
+          },
+          "properties": {
+            "brokers": 3,
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168
           }
         }
       ],
@@ -2242,8 +2271,17 @@
           }
         },
         {
-          "id": "l-api-app",
+          "id": "l-api-lb",
           "source": "api",
+          "target": "lb",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-lb-app",
+          "source": "lb",
           "target": "app",
           "properties": {
             "latencyMs": 4,
@@ -2260,9 +2298,18 @@
           }
         },
         {
-          "id": "l-app-pg",
+          "id": "l-app-ddb",
           "source": "app",
-          "target": "pg",
+          "target": "ddb",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-app-kafka",
+          "source": "app",
+          "target": "kafka",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -2362,18 +2409,18 @@
       ]
     },
     "refArch": {
-      "caption": "Location pings update an in-memory geo index; nearby queries hit that index, and a matching service manages the trip state machine.",
+      "caption": "Search hits an in-memory geo index for nearby candidates, joins business data and reviews from durable stores, and serves photos from a CDN.",
       "nodes": [
         {
           "id": "client",
           "type": "CLIENT",
-          "label": "App",
+          "label": "Client",
           "position": {
             "x": 40,
             "y": 190
           },
           "properties": {
-            "qps": 700,
+            "qps": 1500,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -2383,7 +2430,7 @@
           "type": "API_GATEWAY",
           "label": "API Gateway",
           "position": {
-            "x": 180,
+            "x": 190,
             "y": 190
           },
           "properties": {
@@ -2393,25 +2440,11 @@
           }
         },
         {
-          "id": "lb",
-          "type": "LOAD_BALANCER",
-          "label": "Load Balancer",
-          "position": {
-            "x": 315,
-            "y": 190
-          },
-          "properties": {
-            "algorithm": "round_robin",
-            "health_check_interval": 30,
-            "max_connections": 10000
-          }
-        },
-        {
-          "id": "app",
+          "id": "svc",
           "type": "SERVER",
-          "label": "Match/Geo Svc",
+          "label": "Search Svc",
           "position": {
-            "x": 455,
+            "x": 340,
             "y": 190
           },
           "properties": {
@@ -2423,12 +2456,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "idx",
           "type": "REDIS",
           "label": "Geo Index",
           "position": {
-            "x": 600,
-            "y": 80
+            "x": 510,
+            "y": 70
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -2437,12 +2470,27 @@
           }
         },
         {
-          "id": "cass",
-          "type": "CASSANDRA",
-          "label": "Trips/History",
+          "id": "db",
+          "type": "POSTGRESQL",
+          "label": "Business DB",
           "position": {
-            "x": 600,
-            "y": 200
+            "x": 510,
+            "y": 190
+          },
+          "properties": {
+            "version": "16",
+            "max_connections": 100,
+            "storage_gb": 50,
+            "replication": false
+          }
+        },
+        {
+          "id": "rev",
+          "type": "CASSANDRA",
+          "label": "Reviews",
+          "position": {
+            "x": 510,
+            "y": 310
           },
           "properties": {
             "replication_factor": 3,
@@ -2451,18 +2499,16 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Events",
+          "id": "cdn",
+          "type": "CDN",
+          "label": "Photos",
           "position": {
-            "x": 600,
+            "x": 230,
             "y": 320
           },
           "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
+            "cache_ttl_seconds": 3600,
+            "edge_locations": 50
           }
         }
       ],
@@ -2477,45 +2523,45 @@
           }
         },
         {
-          "id": "l-api-lb",
+          "id": "l-api-svc",
           "source": "api",
-          "target": "lb",
+          "target": "svc",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-lb-app",
-          "source": "lb",
-          "target": "app",
+          "id": "l-svc-idx",
+          "source": "svc",
+          "target": "idx",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-svc-db",
+          "source": "svc",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-svc-rev",
+          "source": "svc",
+          "target": "rev",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-kafka",
-          "source": "app",
-          "target": "kafka",
+          "id": "l-client-cdn",
+          "source": "client",
+          "target": "cdn",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -5082,7 +5128,7 @@
       ]
     },
     "refArch": {
-      "caption": "Shard the primitive by key so no single node is a hotspot; hot state lives in memory with optional durable backing.",
+      "caption": "Clients hash keys through a router (consistent hashing) to the owning shard; shards hold hot state in memory and fall through to a durable backing store on a miss.",
       "nodes": [
         {
           "id": "client",
@@ -5090,51 +5136,35 @@
           "label": "Client",
           "position": {
             "x": 40,
-            "y": 180
+            "y": 200
           },
           "properties": {
-            "qps": 1000,
+            "qps": 6000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "api",
-          "type": "API_GATEWAY",
-          "label": "API",
+          "id": "router",
+          "type": "LOAD_BALANCER",
+          "label": "Cache Router",
           "position": {
-            "x": 190,
-            "y": 180
+            "x": 210,
+            "y": 200
           },
           "properties": {
-            "rate_limit_rps": 1000,
-            "auth_type": "JWT",
-            "cors_enabled": true
+            "algorithm": "round_robin",
+            "health_check_interval": 30,
+            "max_connections": 10000
           }
         },
         {
-          "id": "app",
-          "type": "SERVER",
-          "label": "Service",
-          "position": {
-            "x": 340,
-            "y": 180
-          },
-          "properties": {
-            "cpu_cores": 4,
-            "memory_gb": 16,
-            "os": "Linux",
-            "auto_scaling": false,
-            "max_instances": 6
-          }
-        },
-        {
-          "id": "redis",
+          "id": "n1",
           "type": "REDIS",
-          "label": "In-memory State",
+          "label": "Shard A",
           "position": {
-            "x": 500,
-            "y": 90
+            "x": 400,
+            "y": 70
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -5143,12 +5173,40 @@
           }
         },
         {
-          "id": "pg",
-          "type": "POSTGRESQL",
-          "label": "Durable Backing",
+          "id": "n2",
+          "type": "REDIS",
+          "label": "Shard B",
           "position": {
-            "x": 500,
-            "y": 280
+            "x": 400,
+            "y": 200
+          },
+          "properties": {
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
+          }
+        },
+        {
+          "id": "n3",
+          "type": "REDIS",
+          "label": "Shard C",
+          "position": {
+            "x": 400,
+            "y": 330
+          },
+          "properties": {
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
+          }
+        },
+        {
+          "id": "db",
+          "type": "POSTGRESQL",
+          "label": "Backing Store",
+          "position": {
+            "x": 600,
+            "y": 200
           },
           "properties": {
             "version": "16",
@@ -5160,36 +5218,63 @@
       ],
       "links": [
         {
-          "id": "l-client-api",
+          "id": "l-client-router",
           "source": "client",
-          "target": "api",
+          "target": "router",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-api-app",
-          "source": "api",
-          "target": "app",
+          "id": "l-router-n1",
+          "source": "router",
+          "target": "n1",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-router-n2",
+          "source": "router",
+          "target": "n2",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-pg",
-          "source": "app",
-          "target": "pg",
+          "id": "l-router-n3",
+          "source": "router",
+          "target": "n3",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-n1-db",
+          "source": "n1",
+          "target": "db",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-n2-db",
+          "source": "n2",
+          "target": "db",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-n3-db",
+          "source": "n3",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -5492,7 +5577,7 @@
       ]
     },
     "refArch": {
-      "caption": "Submissions persist and a scheduler leases jobs to isolated workers (containers/microVMs); a DAG engine unblocks downstream tasks.",
+      "caption": "Submissions persist and a scheduler leases jobs to an isolated worker fleet; leases/locks prevent double-execution and job state is durable and queryable.",
       "nodes": [
         {
           "id": "client",
@@ -5503,7 +5588,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 200,
+            "qps": 300,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -5513,7 +5598,7 @@
           "type": "API_GATEWAY",
           "label": "API",
           "position": {
-            "x": 180,
+            "x": 190,
             "y": 190
           },
           "properties": {
@@ -5527,7 +5612,7 @@
           "type": "SERVER",
           "label": "Scheduler",
           "position": {
-            "x": 320,
+            "x": 330,
             "y": 190
           },
           "properties": {
@@ -5539,11 +5624,11 @@
           }
         },
         {
-          "id": "queue",
+          "id": "q",
           "type": "KAFKA",
           "label": "Job Queue",
           "position": {
-            "x": 460,
+            "x": 480,
             "y": 190
           },
           "properties": {
@@ -5554,12 +5639,12 @@
           }
         },
         {
-          "id": "k8s",
+          "id": "workers",
           "type": "K8S_CLUSTER",
           "label": "Worker Fleet",
           "position": {
-            "x": 610,
-            "y": 90
+            "x": 640,
+            "y": 80
           },
           "properties": {
             "version": "1.28",
@@ -5568,11 +5653,11 @@
           }
         },
         {
-          "id": "pg",
+          "id": "state",
           "type": "POSTGRESQL",
           "label": "Job State",
           "position": {
-            "x": 610,
+            "x": 640,
             "y": 210
           },
           "properties": {
@@ -5583,12 +5668,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "leases",
           "type": "REDIS",
-          "label": "Leases",
+          "label": "Leases / Locks",
           "position": {
-            "x": 610,
-            "y": 320
+            "x": 640,
+            "y": 330
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -5617,36 +5702,36 @@
           }
         },
         {
-          "id": "l-sched-queue",
+          "id": "l-sched-q",
           "source": "sched",
-          "target": "queue",
+          "target": "q",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-queue-k8s",
-          "source": "queue",
-          "target": "k8s",
+          "id": "l-q-workers",
+          "source": "q",
+          "target": "workers",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-sched-pg",
+          "id": "l-sched-state",
           "source": "sched",
-          "target": "pg",
+          "target": "state",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-sched-redis",
+          "id": "l-sched-leases",
           "source": "sched",
-          "target": "redis",
+          "target": "leases",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -5991,7 +6076,7 @@
       ]
     },
     "refArch": {
-      "caption": "DNS + CDN + load balancer form the edge; a WAF filters, and a stateless data-plane fleet forwards while the control plane pushes config.",
+      "caption": "The gateway checks a token bucket in Redis before forwarding; buckets are keyed by client/route with atomic decrements, and rules come from a config store.",
       "nodes": [
         {
           "id": "client",
@@ -6002,47 +6087,52 @@
             "y": 190
           },
           "properties": {
-            "qps": 1500,
+            "qps": 3000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "dns",
-          "type": "DNS",
-          "label": "DNS",
+          "id": "gw",
+          "type": "API_GATEWAY",
+          "label": "Gateway + Limiter",
           "position": {
-            "x": 180,
-            "y": 90
-          },
-          "properties": {
-            "ttl": 300,
-            "routing_policy": "simple"
-          }
-        },
-        {
-          "id": "cdn",
-          "type": "CDN",
-          "label": "CDN",
-          "position": {
-            "x": 180,
-            "y": 290
-          },
-          "properties": {
-            "cache_ttl_seconds": 3600,
-            "edge_locations": 50
-          }
-        },
-        {
-          "id": "waf",
-          "type": "WAF",
-          "label": "WAF",
-          "position": {
-            "x": 330,
+            "x": 210,
             "y": 190
           },
           "properties": {
-            "rate_limit": 2000
+            "rate_limit_rps": 1000,
+            "auth_type": "JWT",
+            "cors_enabled": true
+          }
+        },
+        {
+          "id": "redis",
+          "type": "REDIS",
+          "label": "Token Buckets",
+          "position": {
+            "x": 400,
+            "y": 80
+          },
+          "properties": {
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
+          }
+        },
+        {
+          "id": "cfg",
+          "type": "POSTGRESQL",
+          "label": "Limit Rules",
+          "position": {
+            "x": 400,
+            "y": 300
+          },
+          "properties": {
+            "version": "16",
+            "max_connections": 100,
+            "storage_gb": 50,
+            "replication": false
           }
         },
         {
@@ -6050,7 +6140,7 @@
           "type": "LOAD_BALANCER",
           "label": "Load Balancer",
           "position": {
-            "x": 470,
+            "x": 560,
             "y": 190
           },
           "properties": {
@@ -6062,10 +6152,10 @@
         {
           "id": "app",
           "type": "SERVER",
-          "label": "Backends",
+          "label": "Services",
           "position": {
-            "x": 610,
-            "y": 110
+            "x": 700,
+            "y": 190
           },
           "properties": {
             "cpu_cores": 4,
@@ -6074,53 +6164,39 @@
             "auto_scaling": false,
             "max_instances": 6
           }
-        },
-        {
-          "id": "redis",
-          "type": "REDIS",
-          "label": "Shared State",
-          "position": {
-            "x": 610,
-            "y": 280
-          },
-          "properties": {
-            "maxmemory_mb": 256,
-            "eviction_policy": "allkeys-lru",
-            "cluster_mode": false
-          }
         }
       ],
       "links": [
         {
-          "id": "l-client-dns",
+          "id": "l-client-gw",
           "source": "client",
-          "target": "dns",
+          "target": "gw",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-client-cdn",
-          "source": "client",
-          "target": "cdn",
+          "id": "l-gw-redis",
+          "source": "gw",
+          "target": "redis",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-client-waf",
-          "source": "client",
-          "target": "waf",
+          "id": "l-gw-cfg",
+          "source": "gw",
+          "target": "cfg",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-waf-lb",
-          "source": "waf",
+          "id": "l-gw-lb",
+          "source": "gw",
           "target": "lb",
           "properties": {
             "latencyMs": 4,
@@ -6131,15 +6207,6 @@
           "id": "l-lb-app",
           "source": "lb",
           "target": "app",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -6730,7 +6797,7 @@
       ]
     },
     "refArch": {
-      "caption": "Writes fan out into follower feed caches; reads serve a precomputed feed and hydrate content from a store/CDN. Celebrities are merged in on read.",
+      "caption": "Writes fan out into per-follower feed caches; reads serve the precomputed feed and hydrate posts from the store and media from a CDN. Celebrities merge in on read.",
       "nodes": [
         {
           "id": "client",
@@ -6741,7 +6808,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 800,
+            "qps": 1500,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -6775,7 +6842,7 @@
           }
         },
         {
-          "id": "app",
+          "id": "feed",
           "type": "SERVER",
           "label": "Feed Svc",
           "position": {
@@ -6791,7 +6858,7 @@
           }
         },
         {
-          "id": "redis",
+          "id": "cache",
           "type": "REDIS",
           "label": "Feed Cache",
           "position": {
@@ -6805,7 +6872,7 @@
           }
         },
         {
-          "id": "cass",
+          "id": "posts",
           "type": "CASSANDRA",
           "label": "Posts",
           "position": {
@@ -6819,9 +6886,9 @@
           }
         },
         {
-          "id": "kafka",
+          "id": "fan",
           "type": "KAFKA",
-          "label": "Fan-out",
+          "label": "Fan-out on Write",
           "position": {
             "x": 600,
             "y": 310
@@ -6854,36 +6921,36 @@
           }
         },
         {
-          "id": "l-lb-app",
+          "id": "l-lb-feed",
           "source": "lb",
-          "target": "app",
+          "target": "feed",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-feed-cache",
+          "source": "feed",
+          "target": "cache",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-feed-posts",
+          "source": "feed",
+          "target": "posts",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-kafka",
-          "source": "app",
-          "target": "kafka",
+          "id": "l-feed-fan",
+          "source": "feed",
+          "target": "fan",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -7433,12 +7500,12 @@
       ]
     },
     "refArch": {
-      "caption": "Producers write to a durable log that absorbs bursts; stream processors aggregate into a query store, with rollups to cheap storage.",
+      "caption": "Scores update a Redis sorted set for O(log n) ranked reads; a durable DB is the source of truth and an event stream feeds anti-cheat and history.",
       "nodes": [
         {
           "id": "client",
           "type": "CLIENT",
-          "label": "Producers",
+          "label": "Client",
           "position": {
             "x": 40,
             "y": 190
@@ -7452,9 +7519,9 @@
         {
           "id": "api",
           "type": "API_GATEWAY",
-          "label": "Ingest",
+          "label": "API Gateway",
           "position": {
-            "x": 180,
+            "x": 200,
             "y": 190
           },
           "properties": {
@@ -7464,26 +7531,11 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Event Log",
-          "position": {
-            "x": 320,
-            "y": 190
-          },
-          "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
-          }
-        },
-        {
-          "id": "app",
+          "id": "svc",
           "type": "SERVER",
-          "label": "Stream Procs",
+          "label": "Score Svc",
           "position": {
-            "x": 460,
+            "x": 360,
             "y": 190
           },
           "properties": {
@@ -7495,44 +7547,47 @@
           }
         },
         {
-          "id": "cass",
-          "type": "CASSANDRA",
-          "label": "TSDB / OLAP",
+          "id": "zset",
+          "type": "REDIS",
+          "label": "Sorted Set (ZSET)",
           "position": {
-            "x": 610,
-            "y": 90
+            "x": 540,
+            "y": 80
           },
           "properties": {
-            "replication_factor": 3,
-            "consistency_level": "QUORUM",
-            "num_nodes": 3
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
           }
         },
         {
-          "id": "s3",
-          "type": "S3_BUCKET",
-          "label": "Cold Rollups",
+          "id": "db",
+          "type": "POSTGRESQL",
+          "label": "Durable Scores",
           "position": {
-            "x": 610,
-            "y": 210
+            "x": 540,
+            "y": 200
           },
           "properties": {
-            "versioning": true,
-            "encryption": "AES-256",
-            "storage_class": "STANDARD"
+            "version": "16",
+            "max_connections": 100,
+            "storage_gb": 50,
+            "replication": false
           }
         },
         {
-          "id": "prom",
-          "type": "PROMETHEUS",
-          "label": "Alerting",
+          "id": "events",
+          "type": "KAFKA",
+          "label": "Score Events",
           "position": {
-            "x": 610,
+            "x": 540,
             "y": 320
           },
           "properties": {
-            "scrape_interval": 15,
-            "retention_days": 15
+            "brokers": 3,
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168
           }
         }
       ],
@@ -7547,45 +7602,36 @@
           }
         },
         {
-          "id": "l-api-kafka",
+          "id": "l-api-svc",
           "source": "api",
-          "target": "kafka",
+          "target": "svc",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-app",
-          "source": "kafka",
-          "target": "app",
+          "id": "l-svc-zset",
+          "source": "svc",
+          "target": "zset",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-svc-db",
+          "source": "svc",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-s3",
-          "source": "app",
-          "target": "s3",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-app-prom",
-          "source": "app",
-          "target": "prom",
+          "id": "l-svc-events",
+          "source": "svc",
+          "target": "events",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -7686,7 +7732,7 @@
       ]
     },
     "refArch": {
-      "caption": "Writes fan out into follower feed caches; reads serve a precomputed feed and hydrate content from a store/CDN. Celebrities are merged in on read.",
+      "caption": "Metadata and feeds are cache-first over a wide-column store; photos are written once to object storage and always served through a media CDN.",
       "nodes": [
         {
           "id": "client",
@@ -7697,7 +7743,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 800,
+            "qps": 1400,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -7708,7 +7754,7 @@
           "label": "API Gateway",
           "position": {
             "x": 180,
-            "y": 190
+            "y": 90
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -7721,8 +7767,8 @@
           "type": "LOAD_BALANCER",
           "label": "Load Balancer",
           "position": {
-            "x": 315,
-            "y": 190
+            "x": 320,
+            "y": 90
           },
           "properties": {
             "algorithm": "round_robin",
@@ -7733,10 +7779,10 @@
         {
           "id": "app",
           "type": "SERVER",
-          "label": "Feed Svc",
+          "label": "Post/Feed Svc",
           "position": {
-            "x": 450,
-            "y": 190
+            "x": 460,
+            "y": 90
           },
           "properties": {
             "cpu_cores": 4,
@@ -7747,12 +7793,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "cache",
           "type": "REDIS",
           "label": "Feed Cache",
           "position": {
-            "x": 600,
-            "y": 70
+            "x": 620,
+            "y": 90
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -7761,12 +7807,12 @@
           }
         },
         {
-          "id": "cass",
+          "id": "db",
           "type": "CASSANDRA",
           "label": "Posts",
           "position": {
-            "x": 600,
-            "y": 190
+            "x": 620,
+            "y": 210
           },
           "properties": {
             "replication_factor": 3,
@@ -7775,18 +7821,30 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Fan-out",
+          "id": "cdn",
+          "type": "CDN",
+          "label": "Media CDN",
           "position": {
-            "x": 600,
-            "y": 310
+            "x": 230,
+            "y": 300
           },
           "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
+            "cache_ttl_seconds": 3600,
+            "edge_locations": 50
+          }
+        },
+        {
+          "id": "s3",
+          "type": "S3_BUCKET",
+          "label": "Photo Store",
+          "position": {
+            "x": 430,
+            "y": 300
+          },
+          "properties": {
+            "versioning": true,
+            "encryption": "AES-256",
+            "storage_class": "STANDARD"
           }
         }
       ],
@@ -7819,27 +7877,45 @@
           }
         },
         {
-          "id": "l-app-redis",
+          "id": "l-app-cache",
           "source": "app",
-          "target": "redis",
+          "target": "cache",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
+          "id": "l-app-db",
           "source": "app",
-          "target": "cass",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-kafka",
+          "id": "l-app-s3",
           "source": "app",
-          "target": "kafka",
+          "target": "s3",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-client-cdn",
+          "source": "client",
+          "target": "cdn",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-cdn-s3",
+          "source": "cdn",
+          "target": "s3",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -8918,28 +8994,28 @@
       ]
     },
     "refArch": {
-      "caption": "Location pings update an in-memory geo index; nearby queries hit that index, and a matching service manages the trip state machine.",
+      "caption": "Clients stream location over WebSockets; a proximity service updates an in-memory geo index, publishes updates to subscribers, and archives history.",
       "nodes": [
         {
           "id": "client",
           "type": "CLIENT",
-          "label": "App",
+          "label": "Client",
           "position": {
             "x": 40,
             "y": 190
           },
           "properties": {
-            "qps": 700,
-            "protocol": "HTTPS",
+            "qps": 3000,
+            "protocol": "WSS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "api",
+          "id": "gw",
           "type": "API_GATEWAY",
-          "label": "API Gateway",
+          "label": "WS Gateway",
           "position": {
-            "x": 180,
+            "x": 200,
             "y": 190
           },
           "properties": {
@@ -8949,25 +9025,11 @@
           }
         },
         {
-          "id": "lb",
-          "type": "LOAD_BALANCER",
-          "label": "Load Balancer",
-          "position": {
-            "x": 315,
-            "y": 190
-          },
-          "properties": {
-            "algorithm": "round_robin",
-            "health_check_interval": 30,
-            "max_connections": 10000
-          }
-        },
-        {
-          "id": "app",
+          "id": "svc",
           "type": "SERVER",
-          "label": "Match/Geo Svc",
+          "label": "Proximity Svc",
           "position": {
-            "x": 455,
+            "x": 360,
             "y": 190
           },
           "properties": {
@@ -8979,12 +9041,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "geo",
           "type": "REDIS",
           "label": "Geo Index",
           "position": {
-            "x": 600,
-            "y": 80
+            "x": 540,
+            "y": 70
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -8993,26 +9055,12 @@
           }
         },
         {
-          "id": "cass",
-          "type": "CASSANDRA",
-          "label": "Trips/History",
-          "position": {
-            "x": 600,
-            "y": 200
-          },
-          "properties": {
-            "replication_factor": 3,
-            "consistency_level": "QUORUM",
-            "num_nodes": 3
-          }
-        },
-        {
-          "id": "kafka",
+          "id": "pub",
           "type": "KAFKA",
-          "label": "Events",
+          "label": "Location Pub/Sub",
           "position": {
-            "x": 600,
-            "y": 320
+            "x": 540,
+            "y": 190
           },
           "properties": {
             "brokers": 3,
@@ -9020,58 +9068,63 @@
             "replication_factor": 3,
             "retention_hours": 168
           }
+        },
+        {
+          "id": "db",
+          "type": "CASSANDRA",
+          "label": "Location History",
+          "position": {
+            "x": 540,
+            "y": 310
+          },
+          "properties": {
+            "replication_factor": 3,
+            "consistency_level": "QUORUM",
+            "num_nodes": 3
+          }
         }
       ],
       "links": [
         {
-          "id": "l-client-api",
+          "id": "l-client-gw",
           "source": "client",
-          "target": "api",
+          "target": "gw",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-api-lb",
-          "source": "api",
-          "target": "lb",
+          "id": "l-gw-svc",
+          "source": "gw",
+          "target": "svc",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-lb-app",
-          "source": "lb",
-          "target": "app",
+          "id": "l-svc-geo",
+          "source": "svc",
+          "target": "geo",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-svc-pub",
+          "source": "svc",
+          "target": "pub",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-app-kafka",
-          "source": "app",
-          "target": "kafka",
+          "id": "l-svc-db",
+          "source": "svc",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -11900,7 +11953,7 @@
       ]
     },
     "refArch": {
-      "caption": "Segments are served from the CDN off object storage (bottom); a small metadata/API path (top) handles catalog and playback state.",
+      "caption": "Catalog/metadata is cache-first over a library DB; audio files are served from a CDN backed by object storage so the origin is rarely touched.",
       "nodes": [
         {
           "id": "client",
@@ -11911,7 +11964,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 600,
+            "qps": 1200,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -11919,10 +11972,10 @@
         {
           "id": "api",
           "type": "API_GATEWAY",
-          "label": "Metadata API",
+          "label": "API",
           "position": {
-            "x": 200,
-            "y": 80
+            "x": 190,
+            "y": 90
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -11931,12 +11984,12 @@
           }
         },
         {
-          "id": "app",
+          "id": "meta",
           "type": "SERVER",
           "label": "Catalog Svc",
           "position": {
-            "x": 360,
-            "y": 80
+            "x": 340,
+            "y": 90
           },
           "properties": {
             "cpu_cores": 4,
@@ -11947,12 +12000,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "cache",
           "type": "REDIS",
-          "label": "Cache",
+          "label": "Metadata Cache",
           "position": {
-            "x": 520,
-            "y": 80
+            "x": 500,
+            "y": 70
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -11961,45 +12014,45 @@
           }
         },
         {
+          "id": "db",
+          "type": "POSTGRESQL",
+          "label": "Library DB",
+          "position": {
+            "x": 500,
+            "y": 190
+          },
+          "properties": {
+            "version": "16",
+            "max_connections": 100,
+            "storage_gb": 50,
+            "replication": false
+          }
+        },
+        {
           "id": "cdn",
           "type": "CDN",
-          "label": "Edge CDN",
+          "label": "Audio CDN",
           "position": {
-            "x": 200,
+            "x": 230,
             "y": 300
           },
           "properties": {
             "cache_ttl_seconds": 3600,
-            "edge_locations": 120
+            "edge_locations": 50
           }
         },
         {
           "id": "s3",
           "type": "S3_BUCKET",
-          "label": "Segment Origin",
+          "label": "Audio Store",
           "position": {
-            "x": 380,
+            "x": 430,
             "y": 300
           },
           "properties": {
             "versioning": true,
             "encryption": "AES-256",
             "storage_class": "STANDARD"
-          }
-        },
-        {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Transcode Queue",
-          "position": {
-            "x": 560,
-            "y": 300
-          },
-          "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
           }
         }
       ],
@@ -12014,18 +12067,27 @@
           }
         },
         {
-          "id": "l-api-app",
+          "id": "l-api-meta",
           "source": "api",
-          "target": "app",
+          "target": "meta",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-meta-cache",
+          "source": "meta",
+          "target": "cache",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-meta-db",
+          "source": "meta",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -12044,15 +12106,6 @@
           "id": "l-cdn-s3",
           "source": "cdn",
           "target": "s3",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-s3-kafka",
-          "source": "s3",
-          "target": "kafka",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -13092,7 +13145,7 @@
       ]
     },
     "refArch": {
-      "caption": "A waiting room admits users at a safe rate; the hold step atomically flips inventory with a TTL in Redis/DB, and confirmation is idempotent.",
+      "caption": "A waiting room admits users at a safe rate; a hold step atomically reserves seats with a TTL, inventory lives in an ACID DB, and confirmation is queued/idempotent.",
       "nodes": [
         {
           "id": "client",
@@ -13103,17 +13156,17 @@
             "y": 190
           },
           "properties": {
-            "qps": 1000,
+            "qps": 2500,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "api",
+          "id": "wr",
           "type": "API_GATEWAY",
           "label": "Waiting Room",
           "position": {
-            "x": 190,
+            "x": 200,
             "y": 190
           },
           "properties": {
@@ -13127,7 +13180,7 @@
           "type": "LOAD_BALANCER",
           "label": "Load Balancer",
           "position": {
-            "x": 330,
+            "x": 340,
             "y": 190
           },
           "properties": {
@@ -13137,11 +13190,11 @@
           }
         },
         {
-          "id": "app",
+          "id": "book",
           "type": "SERVER",
           "label": "Booking Svc",
           "position": {
-            "x": 470,
+            "x": 480,
             "y": 190
           },
           "properties": {
@@ -13153,12 +13206,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "holds",
           "type": "REDIS",
-          "label": "Holds (TTL)",
+          "label": "Seat Holds (TTL)",
           "position": {
-            "x": 610,
-            "y": 90
+            "x": 620,
+            "y": 80
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -13167,26 +13220,26 @@
           }
         },
         {
-          "id": "pg",
+          "id": "inv",
           "type": "POSTGRESQL",
-          "label": "Inventory/Orders",
+          "label": "Inventory (ACID)",
           "position": {
-            "x": 610,
-            "y": 210
+            "x": 620,
+            "y": 200
           },
           "properties": {
             "version": "16",
             "max_connections": 100,
             "storage_gb": 50,
-            "replication": false
+            "replication": true
           }
         },
         {
-          "id": "sqs",
+          "id": "q",
           "type": "SQS",
-          "label": "Confirm Queue",
+          "label": "Confirm/Email",
           "position": {
-            "x": 610,
+            "x": 620,
             "y": 320
           },
           "properties": {
@@ -13198,17 +13251,17 @@
       ],
       "links": [
         {
-          "id": "l-client-api",
+          "id": "l-client-wr",
           "source": "client",
-          "target": "api",
+          "target": "wr",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-api-lb",
-          "source": "api",
+          "id": "l-wr-lb",
+          "source": "wr",
           "target": "lb",
           "properties": {
             "latencyMs": 4,
@@ -13216,36 +13269,36 @@
           }
         },
         {
-          "id": "l-lb-app",
+          "id": "l-lb-book",
           "source": "lb",
-          "target": "app",
+          "target": "book",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-book-holds",
+          "source": "book",
+          "target": "holds",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-pg",
-          "source": "app",
-          "target": "pg",
+          "id": "l-book-inv",
+          "source": "book",
+          "target": "inv",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-sqs",
-          "source": "app",
-          "target": "sqs",
+          "id": "l-book-q",
+          "source": "book",
+          "target": "q",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -14331,7 +14384,7 @@
       ]
     },
     "refArch": {
-      "caption": "An offline pipeline ingests + indexes into sharded stores; the serving tier scatter-gathers a query, re-ranks the top-k, and caches hot queries.",
+      "caption": "A prefix trie in memory answers suggestions in single-digit ms; query logs stream to an offline builder that rebuilds the trie from an n-gram store on a cadence.",
       "nodes": [
         {
           "id": "client",
@@ -14342,7 +14395,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 900,
+            "qps": 4000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -14352,7 +14405,7 @@
           "type": "API_GATEWAY",
           "label": "Query API",
           "position": {
-            "x": 180,
+            "x": 190,
             "y": 190
           },
           "properties": {
@@ -14362,11 +14415,11 @@
           }
         },
         {
-          "id": "app",
+          "id": "svc",
           "type": "SERVER",
-          "label": "Search Svc",
+          "label": "Suggest Svc",
           "position": {
-            "x": 330,
+            "x": 340,
             "y": 190
           },
           "properties": {
@@ -14378,11 +14431,11 @@
           }
         },
         {
-          "id": "redis",
+          "id": "trie",
           "type": "REDIS",
-          "label": "Query Cache",
+          "label": "Prefix Trie",
           "position": {
-            "x": 480,
+            "x": 500,
             "y": 80
           },
           "properties": {
@@ -14392,12 +14445,12 @@
           }
         },
         {
-          "id": "cass",
+          "id": "db",
           "type": "CASSANDRA",
-          "label": "Index Shards",
+          "label": "N-gram Store",
           "position": {
-            "x": 480,
-            "y": 200
+            "x": 500,
+            "y": 300
           },
           "properties": {
             "replication_factor": 3,
@@ -14406,11 +14459,11 @@
           }
         },
         {
-          "id": "kafka",
+          "id": "log",
           "type": "KAFKA",
-          "label": "Ingest",
+          "label": "Query Logs",
           "position": {
-            "x": 480,
+            "x": 340,
             "y": 320
           },
           "properties": {
@@ -14421,17 +14474,19 @@
           }
         },
         {
-          "id": "s3",
-          "type": "S3_BUCKET",
-          "label": "Doc Store",
+          "id": "build",
+          "type": "SERVER",
+          "label": "Trie Builder",
           "position": {
-            "x": 620,
-            "y": 320
+            "x": 660,
+            "y": 300
           },
           "properties": {
-            "versioning": true,
-            "encryption": "AES-256",
-            "storage_class": "STANDARD"
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
           }
         }
       ],
@@ -14446,45 +14501,54 @@
           }
         },
         {
-          "id": "l-api-app",
+          "id": "l-api-svc",
           "source": "api",
-          "target": "app",
+          "target": "svc",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-svc-trie",
+          "source": "svc",
+          "target": "trie",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-svc-db",
+          "source": "svc",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-cass",
-          "source": "kafka",
-          "target": "cass",
+          "id": "l-svc-log",
+          "source": "svc",
+          "target": "log",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-s3",
-          "source": "kafka",
-          "target": "s3",
+          "id": "l-log-build",
+          "source": "log",
+          "target": "build",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-build-db",
+          "source": "build",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -14578,7 +14642,7 @@
       ]
     },
     "refArch": {
-      "caption": "Shard the primitive by key so no single node is a hotspot; hot state lives in memory with optional durable backing.",
+      "caption": "Stateless ID nodes mint sortable 64-bit IDs from timestamp + worker-id + sequence; a registry hands out unique worker-ids and clocks are kept in sync.",
       "nodes": [
         {
           "id": "client",
@@ -14586,35 +14650,35 @@
           "label": "Client",
           "position": {
             "x": 40,
-            "y": 180
+            "y": 190
           },
           "properties": {
-            "qps": 1000,
+            "qps": 5000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "api",
-          "type": "API_GATEWAY",
-          "label": "API",
+          "id": "lb",
+          "type": "LOAD_BALANCER",
+          "label": "Load Balancer",
           "position": {
-            "x": 190,
-            "y": 180
+            "x": 210,
+            "y": 190
           },
           "properties": {
-            "rate_limit_rps": 1000,
-            "auth_type": "JWT",
-            "cors_enabled": true
+            "algorithm": "round_robin",
+            "health_check_interval": 30,
+            "max_connections": 10000
           }
         },
         {
-          "id": "app",
+          "id": "n1",
           "type": "SERVER",
-          "label": "Service",
+          "label": "ID Node 1",
           "position": {
-            "x": 340,
-            "y": 180
+            "x": 390,
+            "y": 90
           },
           "properties": {
             "cpu_cores": 4,
@@ -14625,26 +14689,28 @@
           }
         },
         {
-          "id": "redis",
-          "type": "REDIS",
-          "label": "In-memory State",
+          "id": "n2",
+          "type": "SERVER",
+          "label": "ID Node 2",
           "position": {
-            "x": 500,
-            "y": 90
+            "x": 390,
+            "y": 290
           },
           "properties": {
-            "maxmemory_mb": 256,
-            "eviction_policy": "allkeys-lru",
-            "cluster_mode": false
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
-          "id": "pg",
+          "id": "reg",
           "type": "POSTGRESQL",
-          "label": "Durable Backing",
+          "label": "Worker-ID Registry",
           "position": {
-            "x": 500,
-            "y": 280
+            "x": 580,
+            "y": 90
           },
           "properties": {
             "version": "16",
@@ -14652,40 +14718,74 @@
             "storage_gb": 50,
             "replication": false
           }
+        },
+        {
+          "id": "ntp",
+          "type": "SERVER",
+          "label": "Time Sync",
+          "position": {
+            "x": 580,
+            "y": 290
+          },
+          "properties": {
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
+          }
         }
       ],
       "links": [
         {
-          "id": "l-client-api",
+          "id": "l-client-lb",
           "source": "client",
-          "target": "api",
+          "target": "lb",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-api-app",
-          "source": "api",
-          "target": "app",
+          "id": "l-lb-n1",
+          "source": "lb",
+          "target": "n1",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-lb-n2",
+          "source": "lb",
+          "target": "n2",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-pg",
-          "source": "app",
-          "target": "pg",
+          "id": "l-n1-reg",
+          "source": "n1",
+          "target": "reg",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-n2-reg",
+          "source": "n2",
+          "target": "reg",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-n2-ntp",
+          "source": "n2",
+          "target": "ntp",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -16014,7 +16114,7 @@
       ]
     },
     "refArch": {
-      "caption": "Clients hold WebSockets to a stateless gateway fleet; a registry (Redis) routes to the right connection, a bus fans out to groups, and history is durable.",
+      "caption": "Clients hold WebSockets to a stateless chat fleet; a session registry routes to the right connection, a bus fans messages out, and history is durable.",
       "nodes": [
         {
           "id": "client",
@@ -16022,10 +16122,10 @@
           "label": "Client",
           "position": {
             "x": 40,
-            "y": 180
+            "y": 190
           },
           "properties": {
-            "qps": 500,
+            "qps": 2000,
             "protocol": "WSS",
             "timeout_ms": 5000
           }
@@ -16036,7 +16136,7 @@
           "label": "WS Gateway",
           "position": {
             "x": 190,
-            "y": 180
+            "y": 190
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -16050,7 +16150,7 @@
           "label": "Load Balancer",
           "position": {
             "x": 320,
-            "y": 180
+            "y": 190
           },
           "properties": {
             "algorithm": "round_robin",
@@ -16061,10 +16161,10 @@
         {
           "id": "chat",
           "type": "SERVER",
-          "label": "Chat Servers",
+          "label": "Chat Svc",
           "position": {
             "x": 460,
-            "y": 180
+            "y": 190
           },
           "properties": {
             "cpu_cores": 4,
@@ -16075,9 +16175,9 @@
           }
         },
         {
-          "id": "redis",
+          "id": "sess",
           "type": "REDIS",
-          "label": "Presence/Registry",
+          "label": "Session Registry",
           "position": {
             "x": 610,
             "y": 70
@@ -16089,9 +16189,9 @@
           }
         },
         {
-          "id": "kafka",
+          "id": "bus",
           "type": "KAFKA",
-          "label": "Fan-out Bus",
+          "label": "Message Bus",
           "position": {
             "x": 610,
             "y": 190
@@ -16104,17 +16204,17 @@
           }
         },
         {
-          "id": "mongo",
-          "type": "MONGODB",
-          "label": "History",
+          "id": "store",
+          "type": "CASSANDRA",
+          "label": "Message Store",
           "position": {
             "x": 610,
             "y": 310
           },
           "properties": {
-            "version": "7.0",
-            "storage_engine": "WiredTiger",
-            "replica_set_members": 3
+            "replication_factor": 3,
+            "consistency_level": "QUORUM",
+            "num_nodes": 3
           }
         }
       ],
@@ -16147,27 +16247,27 @@
           }
         },
         {
-          "id": "l-chat-redis",
+          "id": "l-chat-sess",
           "source": "chat",
-          "target": "redis",
+          "target": "sess",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-chat-kafka",
+          "id": "l-chat-bus",
           "source": "chat",
-          "target": "kafka",
+          "target": "bus",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-chat-mongo",
+          "id": "l-chat-store",
           "source": "chat",
-          "target": "mongo",
+          "target": "store",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -16513,18 +16613,18 @@
       ]
     },
     "refArch": {
-      "caption": "Segments are served from the CDN off object storage (bottom); a small metadata/API path (top) handles catalog and playback state.",
+      "caption": "Uploads are transcoded asynchronously (a queue feeds a worker fleet) into renditions in object storage served by a CDN; a small metadata path handles catalog and playback.",
       "nodes": [
         {
-          "id": "client",
+          "id": "viewer",
           "type": "CLIENT",
-          "label": "Player",
+          "label": "Viewer",
           "position": {
             "x": 40,
             "y": 190
           },
           "properties": {
-            "qps": 600,
+            "qps": 900,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -16532,10 +16632,10 @@
         {
           "id": "api",
           "type": "API_GATEWAY",
-          "label": "Metadata API",
+          "label": "API",
           "position": {
-            "x": 200,
-            "y": 80
+            "x": 180,
+            "y": 90
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -16544,12 +16644,12 @@
           }
         },
         {
-          "id": "app",
+          "id": "meta",
           "type": "SERVER",
           "label": "Catalog Svc",
           "position": {
-            "x": 360,
-            "y": 80
+            "x": 320,
+            "y": 90
           },
           "properties": {
             "cpu_cores": 4,
@@ -16560,38 +16660,55 @@
           }
         },
         {
-          "id": "redis",
-          "type": "REDIS",
-          "label": "Cache",
+          "id": "pg",
+          "type": "POSTGRESQL",
+          "label": "Metadata",
           "position": {
-            "x": 520,
-            "y": 80
+            "x": 460,
+            "y": 90
           },
           "properties": {
-            "maxmemory_mb": 256,
-            "eviction_policy": "allkeys-lru",
-            "cluster_mode": false
+            "version": "16",
+            "max_connections": 100,
+            "storage_gb": 50,
+            "replication": false
           }
         },
         {
-          "id": "cdn",
-          "type": "CDN",
-          "label": "Edge CDN",
+          "id": "tq",
+          "type": "KAFKA",
+          "label": "Transcode Queue",
           "position": {
-            "x": 200,
+            "x": 320,
             "y": 300
           },
           "properties": {
-            "cache_ttl_seconds": 3600,
-            "edge_locations": 120
+            "brokers": 3,
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168
+          }
+        },
+        {
+          "id": "tw",
+          "type": "K8S_CLUSTER",
+          "label": "Transcoders",
+          "position": {
+            "x": 480,
+            "y": 300
+          },
+          "properties": {
+            "version": "1.28",
+            "node_count": 3,
+            "cni_plugin": "calico"
           }
         },
         {
           "id": "s3",
           "type": "S3_BUCKET",
-          "label": "Segment Origin",
+          "label": "Renditions",
           "position": {
-            "x": 380,
+            "x": 640,
             "y": 300
           },
           "properties": {
@@ -16601,25 +16718,23 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Transcode Queue",
+          "id": "cdn",
+          "type": "CDN",
+          "label": "Edge CDN",
           "position": {
-            "x": 560,
+            "x": 180,
             "y": 300
           },
           "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
+            "cache_ttl_seconds": 3600,
+            "edge_locations": 140
           }
         }
       ],
       "links": [
         {
-          "id": "l-client-api",
-          "source": "client",
+          "id": "l-viewer-api",
+          "source": "viewer",
           "target": "api",
           "properties": {
             "latencyMs": 4,
@@ -16627,26 +16742,53 @@
           }
         },
         {
-          "id": "l-api-app",
+          "id": "l-api-meta",
           "source": "api",
-          "target": "app",
+          "target": "meta",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-meta-pg",
+          "source": "meta",
+          "target": "pg",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-client-cdn",
-          "source": "client",
+          "id": "l-meta-tq",
+          "source": "meta",
+          "target": "tq",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-tq-tw",
+          "source": "tq",
+          "target": "tw",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-tw-s3",
+          "source": "tw",
+          "target": "s3",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-viewer-cdn",
+          "source": "viewer",
           "target": "cdn",
           "properties": {
             "latencyMs": 4,
@@ -16657,15 +16799,6 @@
           "id": "l-cdn-s3",
           "source": "cdn",
           "target": "s3",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-s3-kafka",
-          "source": "s3",
-          "target": "kafka",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -16766,18 +16899,18 @@
       ]
     },
     "refArch": {
-      "caption": "Producers write to a durable log that absorbs bursts; stream processors aggregate into a query store, with rollups to cheap storage.",
+      "caption": "Click events land on a durable stream absorbing bursts; windowed aggregators roll them into an OLAP store for dashboards while raw events archive to cheap cold storage.",
       "nodes": [
         {
           "id": "client",
           "type": "CLIENT",
-          "label": "Producers",
+          "label": "Ad Events",
           "position": {
             "x": 40,
             "y": 190
           },
           "properties": {
-            "qps": 2000,
+            "qps": 8000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -16787,7 +16920,7 @@
           "type": "API_GATEWAY",
           "label": "Ingest",
           "position": {
-            "x": 180,
+            "x": 190,
             "y": 190
           },
           "properties": {
@@ -16797,11 +16930,11 @@
           }
         },
         {
-          "id": "kafka",
+          "id": "stream",
           "type": "KAFKA",
-          "label": "Event Log",
+          "label": "Click Stream",
           "position": {
-            "x": 320,
+            "x": 330,
             "y": 190
           },
           "properties": {
@@ -16812,11 +16945,11 @@
           }
         },
         {
-          "id": "app",
+          "id": "agg",
           "type": "SERVER",
-          "label": "Stream Procs",
+          "label": "Aggregators",
           "position": {
-            "x": 460,
+            "x": 480,
             "y": 190
           },
           "properties": {
@@ -16828,11 +16961,11 @@
           }
         },
         {
-          "id": "cass",
+          "id": "olap",
           "type": "CASSANDRA",
-          "label": "TSDB / OLAP",
+          "label": "OLAP Store",
           "position": {
-            "x": 610,
+            "x": 630,
             "y": 90
           },
           "properties": {
@@ -16842,12 +16975,12 @@
           }
         },
         {
-          "id": "s3",
+          "id": "cold",
           "type": "S3_BUCKET",
-          "label": "Cold Rollups",
+          "label": "Raw Cold",
           "position": {
-            "x": 610,
-            "y": 210
+            "x": 630,
+            "y": 290
           },
           "properties": {
             "versioning": true,
@@ -16856,16 +16989,19 @@
           }
         },
         {
-          "id": "prom",
-          "type": "PROMETHEUS",
-          "label": "Alerting",
+          "id": "dash",
+          "type": "SERVER",
+          "label": "Dashboard API",
           "position": {
-            "x": 610,
+            "x": 480,
             "y": 320
           },
           "properties": {
-            "scrape_interval": 15,
-            "retention_days": 15
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
           }
         }
       ],
@@ -16880,45 +17016,45 @@
           }
         },
         {
-          "id": "l-api-kafka",
+          "id": "l-api-stream",
           "source": "api",
-          "target": "kafka",
+          "target": "stream",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-app",
-          "source": "kafka",
-          "target": "app",
+          "id": "l-stream-agg",
+          "source": "stream",
+          "target": "agg",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-agg-olap",
+          "source": "agg",
+          "target": "olap",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-s3",
-          "source": "app",
-          "target": "s3",
+          "id": "l-agg-cold",
+          "source": "agg",
+          "target": "cold",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-prom",
-          "source": "app",
-          "target": "prom",
+          "id": "l-dash-olap",
+          "source": "dash",
+          "target": "olap",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -21353,7 +21489,7 @@
       ]
     },
     "refArch": {
-      "caption": "A coordinator routes to the owning partition; each partition is a WAL-backed engine replicated N ways with consensus for strong consistency.",
+      "caption": "A coordinator routes each key to its owning partition; every partition is replicated N ways (RF3) with a WAL + SSTables on durable volumes for recovery.",
       "nodes": [
         {
           "id": "client",
@@ -21361,21 +21497,21 @@
           "label": "Client",
           "position": {
             "x": 40,
-            "y": 190
+            "y": 200
           },
           "properties": {
-            "qps": 600,
+            "qps": 4000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "lb",
+          "id": "coord",
           "type": "LOAD_BALANCER",
           "label": "Coordinator",
           "position": {
-            "x": 200,
-            "y": 190
+            "x": 210,
+            "y": 200
           },
           "properties": {
             "algorithm": "round_robin",
@@ -21386,10 +21522,10 @@
         {
           "id": "n1",
           "type": "CASSANDRA",
-          "label": "Partition A (RF3)",
+          "label": "Node A (RF3)",
           "position": {
-            "x": 380,
-            "y": 90
+            "x": 400,
+            "y": 70
           },
           "properties": {
             "replication_factor": 3,
@@ -21400,10 +21536,10 @@
         {
           "id": "n2",
           "type": "CASSANDRA",
-          "label": "Partition B (RF3)",
+          "label": "Node B (RF3)",
           "position": {
-            "x": 380,
-            "y": 290
+            "x": 400,
+            "y": 200
           },
           "properties": {
             "replication_factor": 3,
@@ -21412,26 +21548,26 @@
           }
         },
         {
-          "id": "ebs1",
-          "type": "EBS_VOLUME",
-          "label": "WAL + SSTables",
+          "id": "n3",
+          "type": "CASSANDRA",
+          "label": "Node C (RF3)",
           "position": {
-            "x": 560,
-            "y": 90
+            "x": 400,
+            "y": 330
           },
           "properties": {
-            "volume_type": "gp3",
-            "size_gb": 100,
-            "iops": 3000
+            "replication_factor": 3,
+            "consistency_level": "QUORUM",
+            "num_nodes": 3
           }
         },
         {
-          "id": "ebs2",
+          "id": "wal",
           "type": "EBS_VOLUME",
-          "label": "WAL + SSTables",
+          "label": "WAL / SSTables",
           "position": {
-            "x": 560,
-            "y": 290
+            "x": 600,
+            "y": 200
           },
           "properties": {
             "volume_type": "gp3",
@@ -21442,17 +21578,17 @@
       ],
       "links": [
         {
-          "id": "l-client-lb",
+          "id": "l-client-coord",
           "source": "client",
-          "target": "lb",
+          "target": "coord",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-lb-n1",
-          "source": "lb",
+          "id": "l-coord-n1",
+          "source": "coord",
           "target": "n1",
           "properties": {
             "latencyMs": 4,
@@ -21460,8 +21596,8 @@
           }
         },
         {
-          "id": "l-lb-n2",
-          "source": "lb",
+          "id": "l-coord-n2",
+          "source": "coord",
           "target": "n2",
           "properties": {
             "latencyMs": 4,
@@ -21469,18 +21605,36 @@
           }
         },
         {
-          "id": "l-n1-ebs1",
-          "source": "n1",
-          "target": "ebs1",
+          "id": "l-coord-n3",
+          "source": "coord",
+          "target": "n3",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-n2-ebs2",
+          "id": "l-n1-wal",
+          "source": "n1",
+          "target": "wal",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-n2-wal",
           "source": "n2",
-          "target": "ebs2",
+          "target": "wal",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-n3-wal",
+          "source": "n3",
+          "target": "wal",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -24369,7 +24523,7 @@
       ]
     },
     "refArch": {
-      "caption": "A per-document coordinator serializes edits and broadcasts them; snapshots persist to a DB and ops flow over a pub/sub layer.",
+      "caption": "A per-document coordinator serializes edits (OT/CRDT) and broadcasts them over pub/sub; snapshots persist to a DB, the op log is durable, and attachments go to blob storage.",
       "nodes": [
         {
           "id": "client",
@@ -24377,10 +24531,10 @@
           "label": "Editors",
           "position": {
             "x": 40,
-            "y": 180
+            "y": 190
           },
           "properties": {
-            "qps": 400,
+            "qps": 800,
             "protocol": "WSS",
             "timeout_ms": 5000
           }
@@ -24391,7 +24545,7 @@
           "label": "WS Gateway",
           "position": {
             "x": 190,
-            "y": 180
+            "y": 190
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -24402,10 +24556,10 @@
         {
           "id": "coord",
           "type": "SERVER",
-          "label": "Doc Coordinator",
+          "label": "Doc Coordinator (OT)",
           "position": {
             "x": 350,
-            "y": 180
+            "y": 190
           },
           "properties": {
             "cpu_cores": 4,
@@ -24416,12 +24570,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "pubsub",
           "type": "REDIS",
           "label": "Pub/Sub",
           "position": {
-            "x": 520,
-            "y": 80
+            "x": 540,
+            "y": 70
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -24430,12 +24584,12 @@
           }
         },
         {
-          "id": "pg",
+          "id": "snap",
           "type": "POSTGRESQL",
           "label": "Snapshots",
           "position": {
-            "x": 520,
-            "y": 200
+            "x": 540,
+            "y": 190
           },
           "properties": {
             "version": "16",
@@ -24445,18 +24599,32 @@
           }
         },
         {
-          "id": "kafka",
+          "id": "oplog",
           "type": "KAFKA",
           "label": "Op Log",
           "position": {
-            "x": 520,
-            "y": 320
+            "x": 540,
+            "y": 310
           },
           "properties": {
             "brokers": 3,
             "partitions": 12,
             "replication_factor": 3,
             "retention_hours": 168
+          }
+        },
+        {
+          "id": "s3",
+          "type": "S3_BUCKET",
+          "label": "Attachments",
+          "position": {
+            "x": 700,
+            "y": 190
+          },
+          "properties": {
+            "versioning": true,
+            "encryption": "AES-256",
+            "storage_class": "STANDARD"
           }
         }
       ],
@@ -24480,27 +24648,36 @@
           }
         },
         {
-          "id": "l-coord-redis",
+          "id": "l-coord-pubsub",
           "source": "coord",
-          "target": "redis",
+          "target": "pubsub",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-coord-pg",
+          "id": "l-coord-snap",
           "source": "coord",
-          "target": "pg",
+          "target": "snap",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-coord-kafka",
+          "id": "l-coord-oplog",
           "source": "coord",
-          "target": "kafka",
+          "target": "oplog",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-coord-s3",
+          "source": "coord",
+          "target": "s3",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -24594,18 +24771,18 @@
       ]
     },
     "refArch": {
-      "caption": "Location pings update an in-memory geo index; nearby queries hit that index, and a matching service manages the trip state machine.",
+      "caption": "Map tiles are static and served from a CDN over object storage; routing and nearby queries hit an in-memory geo index over a road graph.",
       "nodes": [
         {
           "id": "client",
           "type": "CLIENT",
-          "label": "App",
+          "label": "Client",
           "position": {
             "x": 40,
             "y": 190
           },
           "properties": {
-            "qps": 700,
+            "qps": 3000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -24615,8 +24792,8 @@
           "type": "API_GATEWAY",
           "label": "API Gateway",
           "position": {
-            "x": 180,
-            "y": 190
+            "x": 190,
+            "y": 90
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -24625,26 +24802,12 @@
           }
         },
         {
-          "id": "lb",
-          "type": "LOAD_BALANCER",
-          "label": "Load Balancer",
-          "position": {
-            "x": 315,
-            "y": 190
-          },
-          "properties": {
-            "algorithm": "round_robin",
-            "health_check_interval": 30,
-            "max_connections": 10000
-          }
-        },
-        {
-          "id": "app",
+          "id": "geo",
           "type": "SERVER",
-          "label": "Match/Geo Svc",
+          "label": "Geo/Routing Svc",
           "position": {
-            "x": 455,
-            "y": 190
+            "x": 350,
+            "y": 90
           },
           "properties": {
             "cpu_cores": 4,
@@ -24655,12 +24818,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "idx",
           "type": "REDIS",
-          "label": "Geo Index",
+          "label": "Geo Index (geohash)",
           "position": {
-            "x": 600,
-            "y": 80
+            "x": 520,
+            "y": 70
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -24669,12 +24832,12 @@
           }
         },
         {
-          "id": "cass",
+          "id": "graph",
           "type": "CASSANDRA",
-          "label": "Trips/History",
+          "label": "Road Graph",
           "position": {
-            "x": 600,
-            "y": 200
+            "x": 520,
+            "y": 190
           },
           "properties": {
             "replication_factor": 3,
@@ -24683,18 +24846,30 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Events",
+          "id": "tiles",
+          "type": "CDN",
+          "label": "Map Tiles",
           "position": {
-            "x": 600,
-            "y": 320
+            "x": 230,
+            "y": 300
           },
           "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
+            "cache_ttl_seconds": 3600,
+            "edge_locations": 50
+          }
+        },
+        {
+          "id": "s3",
+          "type": "S3_BUCKET",
+          "label": "Tile Store",
+          "position": {
+            "x": 430,
+            "y": 300
+          },
+          "properties": {
+            "versioning": true,
+            "encryption": "AES-256",
+            "storage_class": "STANDARD"
           }
         }
       ],
@@ -24709,45 +24884,45 @@
           }
         },
         {
-          "id": "l-api-lb",
+          "id": "l-api-geo",
           "source": "api",
-          "target": "lb",
+          "target": "geo",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-lb-app",
-          "source": "lb",
-          "target": "app",
+          "id": "l-geo-idx",
+          "source": "geo",
+          "target": "idx",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-geo-graph",
+          "source": "geo",
+          "target": "graph",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-client-tiles",
+          "source": "client",
+          "target": "tiles",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-kafka",
-          "source": "app",
-          "target": "kafka",
+          "id": "l-tiles-s3",
+          "source": "tiles",
+          "target": "s3",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -27650,28 +27825,28 @@
       ]
     },
     "refArch": {
-      "caption": "Producers write to a durable log that absorbs bursts; stream processors aggregate into a query store, with rollups to cheap storage.",
+      "caption": "Agents push metrics into an ingest tier feeding a time-series DB and a stream; an evaluator fires alerts on rules, dashboards read the TSDB, and long-term data rolls off.",
       "nodes": [
         {
-          "id": "client",
+          "id": "agents",
           "type": "CLIENT",
-          "label": "Producers",
+          "label": "Agents / Exporters",
           "position": {
             "x": 40,
             "y": 190
           },
           "properties": {
-            "qps": 2000,
+            "qps": 6000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "api",
+          "id": "gw",
           "type": "API_GATEWAY",
           "label": "Ingest",
           "position": {
-            "x": 180,
+            "x": 200,
             "y": 190
           },
           "properties": {
@@ -27681,12 +27856,25 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Event Log",
+          "id": "tsdb",
+          "type": "PROMETHEUS",
+          "label": "TSDB",
           "position": {
-            "x": 320,
-            "y": 190
+            "x": 360,
+            "y": 90
+          },
+          "properties": {
+            "scrape_interval": 15,
+            "retention_days": 15
+          }
+        },
+        {
+          "id": "stream",
+          "type": "KAFKA",
+          "label": "Metrics Stream",
+          "position": {
+            "x": 360,
+            "y": 300
           },
           "properties": {
             "brokers": 3,
@@ -27696,12 +27884,12 @@
           }
         },
         {
-          "id": "app",
+          "id": "rules",
           "type": "SERVER",
-          "label": "Stream Procs",
+          "label": "Alert Evaluator",
           "position": {
-            "x": 460,
-            "y": 190
+            "x": 540,
+            "y": 70
           },
           "properties": {
             "cpu_cores": 4,
@@ -27712,97 +27900,83 @@
           }
         },
         {
-          "id": "cass",
-          "type": "CASSANDRA",
-          "label": "TSDB / OLAP",
+          "id": "graf",
+          "type": "GRAFANA",
+          "label": "Dashboards",
           "position": {
-            "x": 610,
-            "y": 90
+            "x": 540,
+            "y": 190
+          },
+          "properties": {
+            "dashboards": 0,
+            "data_sources": 1
+          }
+        },
+        {
+          "id": "store",
+          "type": "CASSANDRA",
+          "label": "Long-term Store",
+          "position": {
+            "x": 540,
+            "y": 320
           },
           "properties": {
             "replication_factor": 3,
             "consistency_level": "QUORUM",
             "num_nodes": 3
           }
-        },
-        {
-          "id": "s3",
-          "type": "S3_BUCKET",
-          "label": "Cold Rollups",
-          "position": {
-            "x": 610,
-            "y": 210
-          },
-          "properties": {
-            "versioning": true,
-            "encryption": "AES-256",
-            "storage_class": "STANDARD"
-          }
-        },
-        {
-          "id": "prom",
-          "type": "PROMETHEUS",
-          "label": "Alerting",
-          "position": {
-            "x": 610,
-            "y": 320
-          },
-          "properties": {
-            "scrape_interval": 15,
-            "retention_days": 15
-          }
         }
       ],
       "links": [
         {
-          "id": "l-client-api",
-          "source": "client",
-          "target": "api",
+          "id": "l-agents-gw",
+          "source": "agents",
+          "target": "gw",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-api-kafka",
-          "source": "api",
-          "target": "kafka",
+          "id": "l-gw-tsdb",
+          "source": "gw",
+          "target": "tsdb",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-app",
-          "source": "kafka",
-          "target": "app",
+          "id": "l-gw-stream",
+          "source": "gw",
+          "target": "stream",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-tsdb-rules",
+          "source": "tsdb",
+          "target": "rules",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-s3",
-          "source": "app",
-          "target": "s3",
+          "id": "l-tsdb-graf",
+          "source": "tsdb",
+          "target": "graf",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-prom",
-          "source": "app",
-          "target": "prom",
+          "id": "l-stream-store",
+          "source": "stream",
+          "target": "store",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -27897,7 +28071,7 @@
       ]
     },
     "refArch": {
-      "caption": "Metadata path (top) is small and DB-backed; the bytes path (bottom) goes to object storage fronted by a CDN — app servers never touch file data.",
+      "caption": "An API tier authenticates and routes; a placement/metadata service maps object keys to storage nodes where bytes are stored redundantly across block volumes.",
       "nodes": [
         {
           "id": "client",
@@ -27908,7 +28082,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 300,
+            "qps": 2000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -27916,10 +28090,10 @@
         {
           "id": "api",
           "type": "API_GATEWAY",
-          "label": "API Gateway",
+          "label": "S3 API",
           "position": {
             "x": 190,
-            "y": 90
+            "y": 190
           },
           "properties": {
             "rate_limit_rps": 1000,
@@ -27933,7 +28107,7 @@
           "label": "Load Balancer",
           "position": {
             "x": 330,
-            "y": 90
+            "y": 190
           },
           "properties": {
             "algorithm": "round_robin",
@@ -27942,12 +28116,12 @@
           }
         },
         {
-          "id": "app",
+          "id": "ctrl",
           "type": "SERVER",
-          "label": "Metadata Svc",
+          "label": "Metadata / Placement",
           "position": {
-            "x": 470,
-            "y": 90
+            "x": 480,
+            "y": 190
           },
           "properties": {
             "cpu_cores": 4,
@@ -27958,45 +28132,43 @@
           }
         },
         {
-          "id": "pg",
-          "type": "POSTGRESQL",
-          "label": "Metadata DB",
+          "id": "meta",
+          "type": "CASSANDRA",
+          "label": "Object Index",
           "position": {
-            "x": 610,
-            "y": 90
+            "x": 650,
+            "y": 80
           },
           "properties": {
-            "version": "16",
-            "max_connections": 100,
-            "storage_gb": 50,
-            "replication": true
+            "replication_factor": 3,
+            "consistency_level": "QUORUM",
+            "num_nodes": 3
           }
         },
         {
-          "id": "cdn",
-          "type": "CDN",
-          "label": "CDN",
+          "id": "d1",
+          "type": "BLOCK_STORAGE",
+          "label": "Storage Node A",
           "position": {
-            "x": 250,
-            "y": 300
+            "x": 650,
+            "y": 200
           },
           "properties": {
-            "cache_ttl_seconds": 3600,
-            "edge_locations": 50
+            "size_gb": 50,
+            "iops": 1000
           }
         },
         {
-          "id": "s3",
-          "type": "S3_BUCKET",
-          "label": "Blob Storage",
+          "id": "d2",
+          "type": "BLOCK_STORAGE",
+          "label": "Storage Node B",
           "position": {
-            "x": 430,
-            "y": 300
+            "x": 650,
+            "y": 320
           },
           "properties": {
-            "versioning": true,
-            "encryption": "AES-256",
-            "storage_class": "STANDARD"
+            "size_gb": 50,
+            "iops": 1000
           }
         }
       ],
@@ -28020,45 +28192,36 @@
           }
         },
         {
-          "id": "l-lb-app",
+          "id": "l-lb-ctrl",
           "source": "lb",
-          "target": "app",
+          "target": "ctrl",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-pg",
-          "source": "app",
-          "target": "pg",
+          "id": "l-ctrl-meta",
+          "source": "ctrl",
+          "target": "meta",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-client-cdn",
-          "source": "client",
-          "target": "cdn",
+          "id": "l-ctrl-d1",
+          "source": "ctrl",
+          "target": "d1",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-cdn-s3",
-          "source": "cdn",
-          "target": "s3",
-          "properties": {
-            "latencyMs": 4,
-            "bandwidthGbps": 10
-          }
-        },
-        {
-          "id": "l-app-s3",
-          "source": "app",
-          "target": "s3",
+          "id": "l-ctrl-d2",
+          "source": "ctrl",
+          "target": "d2",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -28645,7 +28808,7 @@
       ]
     },
     "refArch": {
-      "caption": "Money movements write an append-only ledger in an ACID DB; idempotency keys dedupe retries and an event stream feeds settlement/fraud.",
+      "caption": "Every money movement writes an append-only ledger in an ACID DB; idempotency keys dedupe retries, a PSP adapter talks to the network, and events feed settlement/fraud.",
       "nodes": [
         {
           "id": "client",
@@ -28656,7 +28819,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 400,
+            "qps": 500,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -28666,7 +28829,7 @@
           "type": "API_GATEWAY",
           "label": "API Gateway",
           "position": {
-            "x": 180,
+            "x": 170,
             "y": 190
           },
           "properties": {
@@ -28676,25 +28839,11 @@
           }
         },
         {
-          "id": "lb",
-          "type": "LOAD_BALANCER",
-          "label": "Load Balancer",
-          "position": {
-            "x": 315,
-            "y": 190
-          },
-          "properties": {
-            "algorithm": "round_robin",
-            "health_check_interval": 30,
-            "max_connections": 10000
-          }
-        },
-        {
-          "id": "app",
+          "id": "pay",
           "type": "SERVER",
           "label": "Payment Svc",
           "position": {
-            "x": 455,
+            "x": 320,
             "y": 190
           },
           "properties": {
@@ -28706,12 +28855,26 @@
           }
         },
         {
-          "id": "pg",
+          "id": "idem",
+          "type": "REDIS",
+          "label": "Idempotency Keys",
+          "position": {
+            "x": 480,
+            "y": 70
+          },
+          "properties": {
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
+          }
+        },
+        {
+          "id": "ledger",
           "type": "POSTGRESQL",
           "label": "Ledger (ACID)",
           "position": {
-            "x": 600,
-            "y": 90
+            "x": 480,
+            "y": 190
           },
           "properties": {
             "version": "16",
@@ -28721,25 +28884,11 @@
           }
         },
         {
-          "id": "redis",
-          "type": "REDIS",
-          "label": "Idempotency",
-          "position": {
-            "x": 600,
-            "y": 200
-          },
-          "properties": {
-            "maxmemory_mb": 256,
-            "eviction_policy": "allkeys-lru",
-            "cluster_mode": false
-          }
-        },
-        {
-          "id": "kafka",
+          "id": "events",
           "type": "KAFKA",
           "label": "Settle/Fraud",
           "position": {
-            "x": 600,
+            "x": 480,
             "y": 310
           },
           "properties": {
@@ -28747,6 +28896,22 @@
             "partitions": 12,
             "replication_factor": 3,
             "retention_hours": 168
+          }
+        },
+        {
+          "id": "psp",
+          "type": "SERVER",
+          "label": "PSP Adapter",
+          "position": {
+            "x": 650,
+            "y": 190
+          },
+          "properties": {
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
           }
         }
       ],
@@ -28761,45 +28926,45 @@
           }
         },
         {
-          "id": "l-api-lb",
+          "id": "l-api-pay",
           "source": "api",
-          "target": "lb",
+          "target": "pay",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-lb-app",
-          "source": "lb",
-          "target": "app",
+          "id": "l-pay-idem",
+          "source": "pay",
+          "target": "idem",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-pg",
-          "source": "app",
-          "target": "pg",
+          "id": "l-pay-ledger",
+          "source": "pay",
+          "target": "ledger",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-pay-events",
+          "source": "pay",
+          "target": "events",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-kafka",
-          "source": "app",
-          "target": "kafka",
+          "id": "l-pay-psp",
+          "source": "pay",
+          "target": "psp",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -29900,7 +30065,7 @@
       ]
     },
     "refArch": {
-      "caption": "Requests land on a durable queue; fan-out workers resolve the audience and deliver per-channel with retries and per-provider rate limits.",
+      "caption": "Requests land on a durable queue; fan-out workers resolve the audience, apply prefs/dedup, and deliver per-channel through provider adapters (APNs/FCM) with retries.",
       "nodes": [
         {
           "id": "client",
@@ -29911,7 +30076,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 500,
+            "qps": 4000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -29931,17 +30096,18 @@
           }
         },
         {
-          "id": "sqs",
-          "type": "SQS",
-          "label": "Durable Queue",
+          "id": "q",
+          "type": "KAFKA",
+          "label": "Notification Queue",
           "position": {
             "x": 340,
             "y": 190
           },
           "properties": {
-            "queue_type": "standard",
-            "visibility_timeout": 30,
-            "max_receive_count": 3
+            "brokers": 3,
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168
           }
         },
         {
@@ -29961,12 +30127,12 @@
           }
         },
         {
-          "id": "redis",
+          "id": "prefs",
           "type": "REDIS",
-          "label": "Dedup/Prefs",
+          "label": "Prefs / Dedup",
           "position": {
-            "x": 630,
-            "y": 90
+            "x": 640,
+            "y": 80
           },
           "properties": {
             "maxmemory_mb": 256,
@@ -29975,12 +30141,12 @@
           }
         },
         {
-          "id": "pg",
+          "id": "db",
           "type": "POSTGRESQL",
-          "label": "Devices",
+          "label": "Device Tokens",
           "position": {
-            "x": 630,
-            "y": 210
+            "x": 640,
+            "y": 200
           },
           "properties": {
             "version": "16",
@@ -29990,18 +30156,19 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Receipts",
+          "id": "gw",
+          "type": "SERVER",
+          "label": "APNs/FCM Adapter",
           "position": {
-            "x": 630,
+            "x": 640,
             "y": 320
           },
           "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
           }
         }
       ],
@@ -30016,17 +30183,17 @@
           }
         },
         {
-          "id": "l-api-sqs",
+          "id": "l-api-q",
           "source": "api",
-          "target": "sqs",
+          "target": "q",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-sqs-worker",
-          "source": "sqs",
+          "id": "l-q-worker",
+          "source": "q",
           "target": "worker",
           "properties": {
             "latencyMs": 4,
@@ -30034,27 +30201,27 @@
           }
         },
         {
-          "id": "l-worker-redis",
+          "id": "l-worker-prefs",
           "source": "worker",
-          "target": "redis",
+          "target": "prefs",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-worker-pg",
+          "id": "l-worker-db",
           "source": "worker",
-          "target": "pg",
+          "target": "db",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-worker-kafka",
+          "id": "l-worker-gw",
           "source": "worker",
-          "target": "kafka",
+          "target": "gw",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -32579,7 +32746,7 @@
       ]
     },
     "refArch": {
-      "caption": "Producers write to a durable log that absorbs bursts; stream processors aggregate into a query store, with rollups to cheap storage.",
+      "caption": "A stream of events feeds windowed aggregators using count-min sketch/heaps; the running top-K sits in Redis, rollups persist, and a query API serves the board.",
       "nodes": [
         {
           "id": "client",
@@ -32590,7 +32757,7 @@
             "y": 190
           },
           "properties": {
-            "qps": 2000,
+            "qps": 5000,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
@@ -32610,9 +32777,9 @@
           }
         },
         {
-          "id": "kafka",
+          "id": "stream",
           "type": "KAFKA",
-          "label": "Event Log",
+          "label": "Event Stream",
           "position": {
             "x": 320,
             "y": 190
@@ -32625,11 +32792,11 @@
           }
         },
         {
-          "id": "app",
+          "id": "agg",
           "type": "SERVER",
-          "label": "Stream Procs",
+          "label": "Aggregators (CMS)",
           "position": {
-            "x": 460,
+            "x": 470,
             "y": 190
           },
           "properties": {
@@ -32641,12 +32808,26 @@
           }
         },
         {
-          "id": "cass",
-          "type": "CASSANDRA",
-          "label": "TSDB / OLAP",
+          "id": "redis",
+          "type": "REDIS",
+          "label": "Top-K Heap",
           "position": {
-            "x": 610,
+            "x": 620,
             "y": 90
+          },
+          "properties": {
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
+          }
+        },
+        {
+          "id": "store",
+          "type": "CASSANDRA",
+          "label": "Rollups",
+          "position": {
+            "x": 620,
+            "y": 290
           },
           "properties": {
             "replication_factor": 3,
@@ -32655,30 +32836,19 @@
           }
         },
         {
-          "id": "s3",
-          "type": "S3_BUCKET",
-          "label": "Cold Rollups",
+          "id": "query",
+          "type": "SERVER",
+          "label": "Query API",
           "position": {
-            "x": 610,
-            "y": 210
-          },
-          "properties": {
-            "versioning": true,
-            "encryption": "AES-256",
-            "storage_class": "STANDARD"
-          }
-        },
-        {
-          "id": "prom",
-          "type": "PROMETHEUS",
-          "label": "Alerting",
-          "position": {
-            "x": 610,
+            "x": 470,
             "y": 320
           },
           "properties": {
-            "scrape_interval": 15,
-            "retention_days": 15
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
           }
         }
       ],
@@ -32693,45 +32863,45 @@
           }
         },
         {
-          "id": "l-api-kafka",
+          "id": "l-api-stream",
           "source": "api",
-          "target": "kafka",
+          "target": "stream",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-app",
-          "source": "kafka",
-          "target": "app",
+          "id": "l-stream-agg",
+          "source": "stream",
+          "target": "agg",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-agg-redis",
+          "source": "agg",
+          "target": "redis",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-s3",
-          "source": "app",
-          "target": "s3",
+          "id": "l-agg-store",
+          "source": "agg",
+          "target": "store",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-prom",
-          "source": "app",
-          "target": "prom",
+          "id": "l-query-redis",
+          "source": "query",
+          "target": "redis",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -34204,42 +34374,43 @@
       ]
     },
     "refArch": {
-      "caption": "An offline pipeline ingests + indexes into sharded stores; the serving tier scatter-gathers a query, re-ranks the top-k, and caches hot queries.",
+      "caption": "A URL frontier feeds fetcher workers; a seen-set (Bloom filter) dedupes, the parser extracts links back into the frontier, and pages + the link graph are stored.",
       "nodes": [
         {
-          "id": "client",
+          "id": "seed",
           "type": "CLIENT",
-          "label": "Client",
+          "label": "Seed URLs",
           "position": {
             "x": 40,
             "y": 190
           },
           "properties": {
-            "qps": 900,
+            "qps": 300,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "api",
-          "type": "API_GATEWAY",
-          "label": "Query API",
+          "id": "frontier",
+          "type": "KAFKA",
+          "label": "URL Frontier",
           "position": {
-            "x": 180,
+            "x": 200,
             "y": 190
           },
           "properties": {
-            "rate_limit_rps": 1000,
-            "auth_type": "JWT",
-            "cors_enabled": true
+            "brokers": 3,
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168
           }
         },
         {
-          "id": "app",
+          "id": "fetch",
           "type": "SERVER",
-          "label": "Search Svc",
+          "label": "Fetchers",
           "position": {
-            "x": 330,
+            "x": 360,
             "y": 190
           },
           "properties": {
@@ -34251,11 +34422,11 @@
           }
         },
         {
-          "id": "redis",
+          "id": "dedup",
           "type": "REDIS",
-          "label": "Query Cache",
+          "label": "Seen (Bloom)",
           "position": {
-            "x": 480,
+            "x": 520,
             "y": 80
           },
           "properties": {
@@ -34265,99 +34436,109 @@
           }
         },
         {
-          "id": "cass",
-          "type": "CASSANDRA",
-          "label": "Index Shards",
+          "id": "parse",
+          "type": "SERVER",
+          "label": "Parser",
           "position": {
-            "x": 480,
+            "x": 520,
             "y": 200
           },
           "properties": {
-            "replication_factor": 3,
-            "consistency_level": "QUORUM",
-            "num_nodes": 3
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Ingest",
-          "position": {
-            "x": 480,
-            "y": 320
-          },
-          "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
-          }
-        },
-        {
-          "id": "s3",
+          "id": "store",
           "type": "S3_BUCKET",
-          "label": "Doc Store",
+          "label": "Page Store",
           "position": {
-            "x": 620,
-            "y": 320
+            "x": 680,
+            "y": 120
           },
           "properties": {
             "versioning": true,
             "encryption": "AES-256",
             "storage_class": "STANDARD"
           }
+        },
+        {
+          "id": "graph",
+          "type": "CASSANDRA",
+          "label": "Link Graph",
+          "position": {
+            "x": 680,
+            "y": 300
+          },
+          "properties": {
+            "replication_factor": 3,
+            "consistency_level": "QUORUM",
+            "num_nodes": 3
+          }
         }
       ],
       "links": [
         {
-          "id": "l-client-api",
-          "source": "client",
-          "target": "api",
+          "id": "l-seed-frontier",
+          "source": "seed",
+          "target": "frontier",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-api-app",
-          "source": "api",
-          "target": "app",
+          "id": "l-frontier-fetch",
+          "source": "frontier",
+          "target": "fetch",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-fetch-dedup",
+          "source": "fetch",
+          "target": "dedup",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-fetch-parse",
+          "source": "fetch",
+          "target": "parse",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-cass",
-          "source": "kafka",
-          "target": "cass",
+          "id": "l-parse-store",
+          "source": "parse",
+          "target": "store",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-s3",
-          "source": "kafka",
-          "target": "s3",
+          "id": "l-parse-graph",
+          "source": "parse",
+          "target": "graph",
+          "properties": {
+            "latencyMs": 4,
+            "bandwidthGbps": 10
+          }
+        },
+        {
+          "id": "l-parse-frontier",
+          "source": "parse",
+          "target": "frontier",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
@@ -34452,43 +34633,44 @@
       ]
     },
     "refArch": {
-      "caption": "An offline pipeline ingests + indexes into sharded stores; the serving tier scatter-gathers a query, re-ranks the top-k, and caches hot queries.",
+      "caption": "An offline pipeline builds a sharded inverted index; online, a query fans out (scatter-gather) across index shards, re-ranks the top results, and caches hot queries.",
       "nodes": [
         {
-          "id": "client",
+          "id": "crawler",
           "type": "CLIENT",
-          "label": "Client",
+          "label": "Crawler Feed",
           "position": {
             "x": 40,
-            "y": 190
+            "y": 300
           },
           "properties": {
-            "qps": 900,
+            "qps": 400,
             "protocol": "HTTPS",
             "timeout_ms": 5000
           }
         },
         {
-          "id": "api",
-          "type": "API_GATEWAY",
-          "label": "Query API",
+          "id": "ingest",
+          "type": "KAFKA",
+          "label": "Doc Pipeline",
           "position": {
-            "x": 180,
-            "y": 190
+            "x": 200,
+            "y": 300
           },
           "properties": {
-            "rate_limit_rps": 1000,
-            "auth_type": "JWT",
-            "cors_enabled": true
+            "brokers": 3,
+            "partitions": 12,
+            "replication_factor": 3,
+            "retention_hours": 168
           }
         },
         {
-          "id": "app",
+          "id": "index",
           "type": "SERVER",
-          "label": "Search Svc",
+          "label": "Indexer",
           "position": {
-            "x": 330,
-            "y": 190
+            "x": 360,
+            "y": 300
           },
           "properties": {
             "cpu_cores": 4,
@@ -34499,25 +34681,11 @@
           }
         },
         {
-          "id": "redis",
-          "type": "REDIS",
-          "label": "Query Cache",
-          "position": {
-            "x": 480,
-            "y": 80
-          },
-          "properties": {
-            "maxmemory_mb": 256,
-            "eviction_policy": "allkeys-lru",
-            "cluster_mode": false
-          }
-        },
-        {
-          "id": "cass",
+          "id": "shards",
           "type": "CASSANDRA",
-          "label": "Index Shards",
+          "label": "Inverted Index",
           "position": {
-            "x": 480,
+            "x": 560,
             "y": 200
           },
           "properties": {
@@ -34527,85 +34695,101 @@
           }
         },
         {
-          "id": "kafka",
-          "type": "KAFKA",
-          "label": "Ingest",
+          "id": "query",
+          "type": "API_GATEWAY",
+          "label": "Query API",
           "position": {
-            "x": 480,
-            "y": 320
+            "x": 40,
+            "y": 100
           },
           "properties": {
-            "brokers": 3,
-            "partitions": 12,
-            "replication_factor": 3,
-            "retention_hours": 168
+            "rate_limit_rps": 1000,
+            "auth_type": "JWT",
+            "cors_enabled": true,
+            "qps": 3000
           }
         },
         {
-          "id": "s3",
-          "type": "S3_BUCKET",
-          "label": "Doc Store",
+          "id": "rank",
+          "type": "SERVER",
+          "label": "Ranking / Scatter-Gather",
           "position": {
-            "x": 620,
-            "y": 320
+            "x": 300,
+            "y": 100
           },
           "properties": {
-            "versioning": true,
-            "encryption": "AES-256",
-            "storage_class": "STANDARD"
+            "cpu_cores": 4,
+            "memory_gb": 16,
+            "os": "Linux",
+            "auto_scaling": false,
+            "max_instances": 6
+          }
+        },
+        {
+          "id": "cache",
+          "type": "REDIS",
+          "label": "Query Cache",
+          "position": {
+            "x": 560,
+            "y": 60
+          },
+          "properties": {
+            "maxmemory_mb": 256,
+            "eviction_policy": "allkeys-lru",
+            "cluster_mode": false
           }
         }
       ],
       "links": [
         {
-          "id": "l-client-api",
-          "source": "client",
-          "target": "api",
+          "id": "l-crawler-ingest",
+          "source": "crawler",
+          "target": "ingest",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-api-app",
-          "source": "api",
-          "target": "app",
+          "id": "l-ingest-index",
+          "source": "ingest",
+          "target": "index",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-redis",
-          "source": "app",
-          "target": "redis",
+          "id": "l-index-shards",
+          "source": "index",
+          "target": "shards",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-app-cass",
-          "source": "app",
-          "target": "cass",
+          "id": "l-query-rank",
+          "source": "query",
+          "target": "rank",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-cass",
-          "source": "kafka",
-          "target": "cass",
+          "id": "l-rank-shards",
+          "source": "rank",
+          "target": "shards",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
           }
         },
         {
-          "id": "l-kafka-s3",
-          "source": "kafka",
-          "target": "s3",
+          "id": "l-rank-cache",
+          "source": "rank",
+          "target": "cache",
           "properties": {
             "latencyMs": 4,
             "bandwidthGbps": 10
