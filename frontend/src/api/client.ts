@@ -87,6 +87,7 @@ export const api = {
       body: JSON.stringify({ email, password }),
     }),
   me: () => request<CurrentUser>('/api/v1/auth/me'),
+  logout: () => request<void>('/api/v1/auth/logout', { method: 'POST' }),
 
   // Project cloud sync (all owner-scoped, require a valid token).
   syncProjects: () => request<RemoteProject[]>('/api/v1/projects/sync'),

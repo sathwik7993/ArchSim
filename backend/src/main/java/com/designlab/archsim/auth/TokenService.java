@@ -3,6 +3,7 @@ package com.designlab.archsim.auth;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.slf4j.Logger;
@@ -26,6 +27,11 @@ public class TokenService {
   private static final int MIN_SECRET_LENGTH = 32;
 
   private final byte[] secret;
+
+  // Revoked token signatures → their expiry epoch-seconds, so a signed-out (or
+  // compromised) token stops working before its natural 30-day expiry. In-memory
+  // only; entries self-evict once past expiry. Swap for Redis when multi-instance.
+  private final ConcurrentHashMap<String, Long> revoked = new ConcurrentHashMap<>();
 
   public TokenService(@Value("${archsim.security.token-secret}") String secret, Environment env) {
     boolean prod = env.acceptsProfiles(Profiles.of("prod"));
@@ -63,7 +69,32 @@ public class TokenService {
     if (fields.length != 2 || Long.parseLong(fields[1]) < Instant.now().getEpochSecond()) {
       throw new IllegalArgumentException("Expired token");
     }
+    if (revoked.containsKey(parts[1])) {
+      throw new IllegalArgumentException("Revoked token");
+    }
     return fields[0];
+  }
+
+  /**
+   * Revoke a token (e.g. on sign-out) so it can no longer authenticate. Stores
+   * only the token's signature until its own expiry; malformed tokens are ignored.
+   */
+  public void revoke(String token) {
+    String[] parts = token.split("\\.", 2);
+    if (parts.length != 2) {
+      return;
+    }
+    long now = Instant.now().getEpochSecond();
+    try {
+      String payload = new String(Base64.getUrlDecoder().decode(parts[0]), StandardCharsets.UTF_8);
+      String[] fields = payload.split("\\.", 2);
+      long expiresAt = fields.length == 2 ? Long.parseLong(fields[1]) : now + TOKEN_TTL_SECONDS;
+      revoked.put(parts[1], expiresAt);
+    } catch (RuntimeException ignored) {
+      return;
+    }
+    // Opportunistically evict entries whose tokens have already expired.
+    revoked.values().removeIf(exp -> exp < now);
   }
 
   private String sign(String payload) {

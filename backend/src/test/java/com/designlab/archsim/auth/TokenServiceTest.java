@@ -56,4 +56,30 @@ class TokenServiceTest {
     TokenService tokens = service("local-development-secret-change-me");
     assertEquals("usr-1", tokens.verify(tokens.issue("usr-1")));
   }
+
+  @Test
+  void revokedTokenNoLongerVerifies() {
+    TokenService tokens = service(STRONG_SECRET);
+    String token = tokens.issue("usr-42");
+    assertEquals("usr-42", tokens.verify(token));
+    tokens.revoke(token);
+    assertThrows(IllegalArgumentException.class, () -> tokens.verify(token));
+  }
+
+  @Test
+  void revokingOneTokenLeavesOthersValid() {
+    TokenService tokens = service(STRONG_SECRET);
+    String a = tokens.issue("usr-a");
+    String b = tokens.issue("usr-b");
+    tokens.revoke(a);
+    assertThrows(IllegalArgumentException.class, () -> tokens.verify(a));
+    assertEquals("usr-b", tokens.verify(b));
+  }
+
+  @Test
+  void revokingAMalformedTokenIsANoOp() {
+    TokenService tokens = service(STRONG_SECRET);
+    tokens.revoke("garbage"); // must not throw
+    assertEquals("usr-1", tokens.verify(tokens.issue("usr-1")));
+  }
 }

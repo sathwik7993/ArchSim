@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +54,15 @@ public class AuthController {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials");
     }
     return AuthResponse.of(user, tokenService.issue(user.id));
+  }
+
+  /** Revoke the caller's token so it can no longer be used (sign-out everywhere). */
+  @PostMapping("/logout")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void logout(@RequestHeader(value = "Authorization", required = false) String authorization) {
+    if (authorization != null && authorization.startsWith("Bearer ")) {
+      tokenService.revoke(authorization.substring(7));
+    }
   }
 
   @PostMapping("/refresh")

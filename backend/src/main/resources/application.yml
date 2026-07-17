@@ -12,6 +12,9 @@ spring:
 
 server:
   port: ${PORT:8080}
+  # Behind a TLS-terminating reverse proxy / load balancer, trust the
+  # X-Forwarded-* headers so generated URLs and HSTS reflect https.
+  forward-headers-strategy: framework
 
 management:
   endpoints:

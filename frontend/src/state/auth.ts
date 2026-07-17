@@ -95,6 +95,12 @@ export const useAuth = create<AuthState>((set) => ({
   },
 
   logout: () => {
+    // Best-effort server-side revocation (while the token is still present),
+    // so the token can't be reused if it leaked. Ignore failures — sign-out
+    // must always succeed locally.
+    if (getAccessToken()) {
+      void api.logout().catch(() => {});
+    }
     setAccessToken('');
     writeUser(null);
     set({ user: null, status: 'anonymous', error: null });
