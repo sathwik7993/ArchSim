@@ -1,5 +1,9 @@
 package com.designlab.archsim.auth;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.security.Principal;
 import java.util.Map;
 import java.util.UUID;
@@ -28,7 +32,7 @@ public class AuthController {
 
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.CREATED)
-  public AuthResponse register(@RequestBody RegisterRequest request) {
+  public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
     users.findByEmail(request.email()).ifPresent(existing -> {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
     });
@@ -42,7 +46,7 @@ public class AuthController {
   }
 
   @PostMapping("/login")
-  public AuthResponse login(@RequestBody LoginRequest request) {
+  public AuthResponse login(@Valid @RequestBody LoginRequest request) {
     UserAccount user = users.findByEmail(request.email())
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
     if (!passwordEncoder.matches(request.password(), user.passwordHash)) {
@@ -70,8 +74,14 @@ public class AuthController {
     return new UserDto(user.id, user.email, user.displayName);
   }
 
-  public record RegisterRequest(String email, String password, String displayName) {}
-  public record LoginRequest(String email, String password) {}
+  public record RegisterRequest(
+      @NotBlank @Email @Size(max = 254) String email,
+      @NotBlank @Size(min = 6, max = 200) String password,
+      @Size(max = 100) String displayName) {}
+
+  public record LoginRequest(
+      @NotBlank @Email @Size(max = 254) String email,
+      @NotBlank @Size(max = 200) String password) {}
   public record UserDto(String userId, String email, String displayName) {}
   public record AuthResponse(String userId, String email, String displayName, String accessToken) {
     static AuthResponse of(UserAccount user, String token) {

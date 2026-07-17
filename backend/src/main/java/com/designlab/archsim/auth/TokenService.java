@@ -5,20 +5,40 @@ import java.time.Instant;
 import java.util.Base64;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TokenService {
+  private static final Logger log = LoggerFactory.getLogger(TokenService.class);
+
   // Access tokens are long-lived (30 days) so students stay signed in across
   // sessions. There is no refresh-token infrastructure; this is a deliberate
   // trade-off for a low-stakes learning app where the token only guards a user's
   // own designs and progress.
   private static final long TOKEN_TTL_SECONDS = 30L * 24 * 60 * 60;
 
+  private static final String INSECURE_DEFAULT = "local-development-secret-change-me";
+  private static final int MIN_SECRET_LENGTH = 32;
+
   private final byte[] secret;
 
-  public TokenService(@Value("${archsim.security.token-secret}") String secret) {
+  public TokenService(@Value("${archsim.security.token-secret}") String secret, Environment env) {
+    boolean prod = env.acceptsProfiles(Profiles.of("prod"));
+    boolean insecure = INSECURE_DEFAULT.equals(secret) || secret.length() < MIN_SECRET_LENGTH;
+    if (insecure) {
+      String msg = "archsim.security.token-secret is weak or left at the insecure default. "
+          + "Set ARCHSIM_TOKEN_SECRET to a random value of at least " + MIN_SECRET_LENGTH
+          + " characters (e.g. `openssl rand -base64 48`).";
+      if (prod) {
+        throw new IllegalStateException("Refusing to start under the 'prod' profile: " + msg);
+      }
+      log.warn("SECURITY WARNING: {}", msg);
+    }
     this.secret = secret.getBytes(StandardCharsets.UTF_8);
   }
 
