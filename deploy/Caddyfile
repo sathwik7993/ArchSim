@@ -1,0 +1,17 @@
+# Caddy automatically obtains and renews a Let's Encrypt certificate for this
+# domain (ports 80 + 443 must be reachable from the internet, and the domain's
+# DNS A record must point at this host).
+#
+# Everything is one origin: Caddy → frontend nginx, which serves the SPA and
+# proxies /api and /ws to the backend. Change the domain if you use another.
+
+arch-sim.dev {
+	encode gzip zstd
+	reverse_proxy frontend:80
+}
+
+# Redirect the www variant to the apex (optional — only works if you also point
+# www.arch-sim.dev at this host in DNS).
+www.arch-sim.dev {
+	redir https://arch-sim.dev{uri} permanent
+}

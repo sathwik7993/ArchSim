@@ -1,0 +1,56 @@
+# Production stack for a single always-on host (e.g. an AWS EC2 t3.micro).
+#
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# Differences from the local docker-compose.yml:
+#   - No postgres/redis containers — the database is an external managed
+#     Postgres (AWS RDS). Point DATABASE_URL at it in `.env`.
+#   - Caddy terminates TLS for your domain and reverse-proxies to the frontend
+#     (which already serves the SPA and proxies /api + /ws to the backend), so
+#     everything is one HTTPS origin — no CORS, no separate API subdomain.
+#   - Runs the `prod` Spring profile, which enforces a strong ARCHSIM_TOKEN_SECRET.
+#
+# Configure by copying deploy/.env.example to .env next to this file.
+
+services:
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      ARCHSIM_TOKEN_SECRET: ${ARCHSIM_TOKEN_SECRET}
+      ARCHSIM_ALLOWED_ORIGINS: ${ARCHSIM_ALLOWED_ORIGINS:-https://arch-sim.dev}
+      SPRING_PROFILES_ACTIVE: prod
+      PORT: "8080"
+      # Keep the JVM within the t3.micro's 1 GB (read automatically by the JVM).
+      JAVA_TOOL_OPTIONS: "-XX:MaxRAMPercentage=60.0"
+    mem_limit: 700m
+    restart: unless-stopped
+    expose:
+      - "8080"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+
+volumes:
+  caddy_data:
+  caddy_config:
