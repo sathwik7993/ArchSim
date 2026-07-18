@@ -1,11 +1,13 @@
 # DesignLab ArchSim
 
+### ▶ Live at **[arch-sim.dev](https://arch-sim.dev)**
+
 ArchSim is an interactive **distributed-systems simulation workbench** — design an architecture on an infinite canvas, simulate traffic flowing through it, and watch every component behave like the real thing. It doubles as a **system-design interview trainer**: practice 148 real problems, sketch your solution on the canvas, then compare it against a complete reference architecture.
 
 The repository keeps the original product specifications in `ArchSim/` (see also `documentation.md`) and implements the runnable application as two root-level projects:
 
 - `frontend`: React 18 + TypeScript + Vite + Zustand (served by nginx in Docker).
-- `backend`: Java 17 + Spring Boot 3 (Postgres 16 + Redis 7, Flyway migrations).
+- `backend`: Java 17 + Spring Boot 3 (Postgres 16, Flyway migrations).
 
 ## Features
 
@@ -65,6 +67,14 @@ cd frontend && npm install && npm run dev
 
 ```powershell
 cd frontend && npm run build   # tsc typecheck + production build
-cd frontend && npx vitest run  # unit tests (engine, cost, catalog, workspace, AI parsing…)
-cd backend  && mvn -o compile  # backend compile
+cd frontend && npx vitest run  # unit tests (engine, cost, catalog, workspace, reference architectures…)
+cd backend  && mvn -o clean test  # backend unit + API tests
 ```
+
+## Production deployment
+
+The live site runs on a single AWS EC2 instance (Docker Compose: backend + nginx
+frontend + Caddy for TLS) with a managed RDS PostgreSQL database, served over HTTPS
+at [arch-sim.dev](https://arch-sim.dev). It's plain Docker + Postgres, so it runs on
+any host. See **[DEPLOYMENT.md](DEPLOYMENT.md)** for the full step-by-step, and
+`docker-compose.prod.yml` + `deploy/` for the production stack.
